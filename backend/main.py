@@ -9,8 +9,7 @@ from decouple import config
 import openai
 
 #Custom Function Imports
-#
-#...
+from functions.openai_requests import convert_audio_to_text
 
 #initiate app
 app = FastAPI()
@@ -37,6 +36,22 @@ app.add_middleware(
 async def check_health():
     return {"message": "NeoChatBot! Healthy"}
 
+#get audio
+@app.get("/post-audio-get/")
+async def get_audio():
+
+    #get saved audio
+    audio_input = open("voice.mp3", "rb") #r = read rb = read bytes
+
+    #decode audio
+    message_decoded = convert_audio_to_text(audio_input)
+
+    print (message_decoded)
+
+    return "Done"
+
+
+    
 # post chatbot response; not playing in browser whebn using post request
 # @app.post("/post-audio/")
 # async def post_audio(file: UploadFile = File(...)):
