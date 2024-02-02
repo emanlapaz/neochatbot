@@ -2,3 +2,5 @@ backend/virtEnv
 frontend/node_modules
 backend/.env
 backend/voice.mp3
+backend/userFile.wav
+backend/stored_data.json
