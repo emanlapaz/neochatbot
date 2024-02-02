@@ -95,14 +95,3 @@ async def post_audio(file: UploadFile = File(...)):
     #return audio file
     #return StreamingResponse(iterfile(), media_type="audio/mpeg")    
     return StreamingResponse(iterfile(), media_type="application/octet-stream")
-
- 
-
-    return "Done"
-
-
-    
-# post chatbot response; not playing in browser whebn using post request
-# @app.post("/post-audio/")
-# async def post_audio(file: UploadFile = File(...)):
-#     print("hello")
