@@ -11,9 +11,14 @@ function Controller() {
 
     return (
         <div className ="h-screen overflow-y-hidden">
-     <Title setMessages={setMessages}/>
+            <Title setMessages={setMessages}/>
             <div className="flex flex-col justify-between h-full overflow-y-scroll pb-96">
-                Placeholder
+                <div className="fixed bottom-0 w-full py-6 border-t text-center bg-gradient-to-r from-sky-500 to-gray-500 ">
+                <div className="flex justify-center items-center w-full">
+                    <div>Recorder PlaceHolder</div>
+                </div>
+               
+                </div>
             </div>
         </div>
     );
