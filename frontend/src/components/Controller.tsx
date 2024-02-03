@@ -93,6 +93,17 @@ function Controller() {
               </div>
             );
           })}
+          {messages.length == 0 && !isLoading && (
+            <div className="text-center font-light italic mt-10">
+              Press the microphone to talk...
+            </div>
+          )}
+
+          {isLoading && (
+            <div className="text-center font-light italic mt-10 animate-pulse">
+              Please wait...
+            </div>
+          )}
         </div>
 
         {/*recorder*/}
