@@ -4,3 +4,4 @@ backend/.env
 backend/voice.mp3
 backend/userFile.wav
 backend/stored_data.json
+backend/local_data.json

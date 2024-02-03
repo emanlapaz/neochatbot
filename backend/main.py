@@ -9,7 +9,7 @@ from decouple import config
 import openai
 
 #Custom Function Imports
-from functions.database import store_messages, reset_messages
+from functions.local_database import save_messages, reset_chat_history
 from functions.openai_requests import convert_audio_to_text, get_chat_response
 from functions.text_to_speech import convert_text_to_speech
 
@@ -42,7 +42,7 @@ async def check_health():
 #reset messages
 @app.get("/reset")
 async def reset_conversation():
-    reset_messages()
+    reset_chat_history()
     return {"message": "conversation reset"}
 
 
@@ -78,7 +78,7 @@ async def post_audio(file: UploadFile = File(...)):
         return HTTPException(status_code=400, detail="Failed to get chat response")
     
     #Store messages
-    store_messages(message_decoded, chat_response)
+    save_messages(message_decoded, chat_response)
 
     #convert chat response to audio
     print(chat_response)
