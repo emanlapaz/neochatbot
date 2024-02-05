@@ -2,10 +2,10 @@ import random
 import json #module for JSON file handling
 
 
-def fetch_latest_messages():
+def fetch_latest_chat():
 
 
-    file_name = "local_data.json" #file from which to fetch the message
+    local_file = "local_data.json" #file from which to fetch the message
 
     #Preset values for prompt instructions
     voice_name = "Paddy"
@@ -45,7 +45,7 @@ def fetch_latest_messages():
 
     #get last messages
     try:
-        with open(file_name) as user_file:
+        with open(local_file) as user_file:
             data = json.load(user_file) #Load the JSON data from the file
 
             #append last 5 items of data

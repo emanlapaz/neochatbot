@@ -2,7 +2,7 @@ import openai
 from decouple import config
 
 #Import custom functions
-from functions.prompts import fetch_latest_messages
+from functions.prompts import fetch_latest_chat
 
 
 #retrieve ENV
@@ -29,7 +29,7 @@ def convert_audio_to_text(audio_file):
 
 def get_chat_response(message_input):
 
-    messages = fetch_latest_messages()
+    messages = fetch_latest_chat()
     user_message = {"role": "user", "content": message_input}
     messages.append(user_message)
     print(messages)

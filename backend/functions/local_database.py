@@ -1,14 +1,14 @@
 import json
-from functions.prompts import fetch_latest_messages 
+from functions.prompts import fetch_latest_chat
 
 #store Messages
-def save_messages(request_message, response_message):
+def save_chat(request_message, response_message):
     
     #define file name
-    file_name = "local_data.json"
+    local_file = "local_data.json"
 
     #get recent messages
-    messages = fetch_latest_messages()[1:]
+    messages = fetch_latest_chat()[1:]
 
     #add messages to data
     user_message = {"role": "user", "content": request_message }
@@ -17,7 +17,7 @@ def save_messages(request_message, response_message):
     messages.append(assistant_message)
 
     #save the updated file
-    with open(file_name, "w") as f:
+    with open(local_file, "w") as f:
         json.dump(messages, f)
 
     #reset messages
