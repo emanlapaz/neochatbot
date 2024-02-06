@@ -4,7 +4,7 @@ type Props = {
   classText: string;
 };
 
-function RecordIcon({ classText }: Props) {
+function MicroPhoneIcon({ classText }: Props) {
   return (
     <>
       <svg
@@ -25,4 +25,4 @@ function RecordIcon({ classText }: Props) {
   );
 }
 
-export default RecordIcon;
+export default MicroPhoneIcon;

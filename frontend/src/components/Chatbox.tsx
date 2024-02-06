@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Title from "./Title";
-import RecordMessage from "./RecordMessage";
+import Title from "./ChatBoxTitle";
+import RecordChat from "./RecordChat";
 import axios from "axios";
 
-function Controller() {
+function Chatbox() {
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<any[]>([]);
 
@@ -60,9 +60,10 @@ function Controller() {
   return (
     <div className="h-screen overflow-y-hidden">
       <Title setMessages={setMessages} />
-      <div className="flex flex-col justify-between h-full overflow-y-scroll pb-96">
-        {/*chat: loop and iterates the messages*/}
-        <div className="mt-5 px-5">
+      <div className="flex flex-col justify-between h-5/6 overflow-y-scroll bg-black text-white">
+        <div className="w-full mt-5 p-2 px-5">
+          {" "}
+          {/* Chat: loop and iterates the messages */}
           {messages.map((audio, index) => {
             return (
               <div
@@ -71,7 +72,7 @@ function Controller() {
                   "flex flex-col " + (audio.sender == "neo" && "flex items-end")
                 }
               >
-                {/*Sender*/}
+                {/* Sender */}
                 <div className="mt-4">
                   <p
                     className={
@@ -83,7 +84,7 @@ function Controller() {
                     {audio.sender}
                   </p>
 
-                  {/*audio message*/}
+                  {/* Audio message */}
                   <audio
                     src={audio.blobUrl}
                     className="appearance-none"
@@ -95,28 +96,34 @@ function Controller() {
           })}
           {messages.length == 0 && !isLoading && (
             <div className="text-center font-light italic mt-10">
-              Press the microphone to talk...
+              Press the microphone to talk or Type to Chat
             </div>
           )}
-
           {isLoading && (
             <div className="text-center font-light italic mt-10 animate-pulse">
               Please wait...
             </div>
           )}
         </div>
-
-        {/*recorder*/}
-        <div className="fixed bottom-0 w-full py-6 border-t text-center bg-gradient-to-r from-sky-500 to-green-500">
-          <div className="flex justify-center items-center w-full">
-            <div>
-              <RecordMessage handleStop={handleStop} />
-            </div>
-          </div>
+      </div>
+      <div className="flex justify-between">
+        <div className="flex-grow pr-10 py-4">
+          <label htmlFor="textInput" className="block text-white">
+            Chat here:
+          </label>
+          <input
+            type="text"
+            id="textInput"
+            className="w-full border border-gray-400 rounded-lg px-3 py-4 mt-1 focus:outline-none focus:ring focus:border-blue-500"
+            placeholder="Enter text here..."
+          />
+        </div>
+        <div className="pt-4 pr-8">
+          <RecordChat handleStop={handleStop} />
         </div>
       </div>
     </div>
   );
 }
 
-export default Controller;
+export default Chatbox;

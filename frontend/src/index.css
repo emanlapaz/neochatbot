@@ -6,4 +6,7 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background: linear-gradient(180deg, rgba(42.85, 216.81, 255, 0.62) 0%, rgb(3.66, 0, 45.69) 68.36%);
+  background-color: rgba(255, 255, 255, 1);
+  
 }

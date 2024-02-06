@@ -1,11 +1,11 @@
-import Controller from "./components/Controller";
+import Main from "./pages/Main"; // Render the Main Page
 
 function App() {
   return (
     <div className="">
-     <Controller/>
+      <Main />
     </div>
   );
 }
 
-export default App
+export default App;
