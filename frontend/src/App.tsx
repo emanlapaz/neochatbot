@@ -1,11 +1,23 @@
-import Main from "./pages/Main"; // Render the Main Page
+// App.tsx
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Main from "./pages/Main";
+import LoginPage from "./pages/Login";
+import About from "./pages/About"; // Ensure this is imported if you're using it
+import AccountSetting from "./pages/AccountSetting"; // Import the AccountSetting component
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="">
-      <Main />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/main" element={<Main />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/account-settings" element={<AccountSetting />} />
+        <Route path="/" element={<LoginPage />} />
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
 export default App;
