@@ -59,7 +59,9 @@ function Chatbox() {
             </p>
           </div>
         ))}
-        {isLoading && <p className="text-center">Waiting for reply...</p>}
+        {isLoading && (
+          <p className="text-center  text-white">Waiting for reply...</p>
+        )}
       </div>
       <div className="p-4">
         <input

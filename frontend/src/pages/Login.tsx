@@ -27,6 +27,12 @@ const LoginPage: React.FC = () => {
           <h1 className="text-4xl font-bold text-white mb-4">
             NEO ChatBot Creator
           </h1>
+          <img
+            className="mt-1 mx-auto object-cover rounded-lg shadow-md"
+            src="neo_icon.png"
+            alt="Our Team"
+            style={{ maxWidth: "90%", height: "auto" }}
+          />
           <p className="mb-4 text-white">
             NEO ChatBot is a web-based AI chatbot creation platform designed for
             ease of use and flexibility. It enables users to build, fine-tune,
@@ -38,22 +44,15 @@ const LoginPage: React.FC = () => {
             for businesses and individuals to create intelligent conversational
             agents without the need for extensive programming knowledge.
           </p>
-          <img
-            className="mt-1 mx-auto object-cover rounded-lg shadow-md"
-            src="neo_icon.png"
-            alt="Our Team"
-            style={{ maxWidth: "90%", height: "auto" }}
-          />
         </div>
 
         {/* Login Form */}
-        <div className="flex-1 p-8 bg-gray-100 rounded-lg shadow-md">
-          <h1 className="text-4xl font-bold mb-4">
-            Login to NEO ChatBot Creator
-          </h1>
-          <form onSubmit={handleLogin}>
-            {/* Inputs and Submit Button */}
-            <form onSubmit={handleLogin}>
+        <div className="flex items-center justify-center">
+          <div className="w-auto p-8 bg-white rounded-lg shadow-md">
+            <h1 className="text-4xl font-bold mb-4">
+              Login to NEO ChatBot Creator
+            </h1>
+            <form onSubmit={handleLogin} className="space-y-6">
               {/* Username Input */}
               <div className="mb-4">
                 <input
@@ -75,24 +74,24 @@ const LoginPage: React.FC = () => {
                 />
               </div>
               {/* Submit Button */}
+              <button
+                type="submit"
+                className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              >
+                Sign In
+              </button>
             </form>
-            <button
-              type="submit"
-              className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Sign In
-            </button>
-          </form>
-          {/* Sign Up Link */}
-          <p className="mt-4 text-gray-600">
-            Don't have an account?{" "}
-            <button
-              onClick={handleSignUp}
-              className="text-blue-500 hover:text-blue-700 font-semibold"
-            >
-              Sign up
-            </button>
-          </p>
+            {/* Sign Up Link */}
+            <p className="mt-4 text-gray-600">
+              Don't have an account?{" "}
+              <span
+                onClick={handleSignUp}
+                className="text-blue-500 hover:text-blue-700 font-semibold cursor-pointer"
+              >
+                Sign up
+              </span>
+            </p>
+          </div>
         </div>
       </div>
     </div>
