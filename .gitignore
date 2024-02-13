@@ -5,3 +5,6 @@ backend/voice.mp3
 backend/userFile.wav
 backend/stored_data.json
 backend/local_data.json
+backend/neo-chatbot-e6c8c-firebase-adminsdk-mnv0s-cccccdc3f9.json
+frontend/firebaseConfig.js
+frontend/firebaseConfig.ts

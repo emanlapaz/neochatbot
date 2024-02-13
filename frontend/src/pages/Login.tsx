@@ -1,20 +1,34 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../firebaseConfig";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleLogin = (event: React.FormEvent) => {
+  const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log("Performing login with", { username, password });
-    navigate("/main");
+    try {
+      // Attempt to log in
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("Login successful");
+      navigate("/main");
+    } catch (error) {
+      let errorMessage = "An unknown error occurred";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      console.error("Login failed: ", errorMessage);
+      setErrorMessage(errorMessage); // Set error message state
+    }
   };
 
   const handleSignUp = () => {
-    navigate("/signup"); // Adjust the route as necessary
+    navigate("/signup"); // Navigate to the signup page
   };
 
   return (
@@ -52,15 +66,19 @@ const LoginPage: React.FC = () => {
             <h1 className="text-4xl font-bold mb-4">
               Login to NEO ChatBot Creator
             </h1>
+            {/* Display Error Message */}
+            {errorMessage && (
+              <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
+            )}
             <form onSubmit={handleLogin} className="space-y-6">
-              {/* Username Input */}
+              {/* Email Input */}
               <div className="mb-4">
                 <input
-                  type="text"
+                  type="email" // Change type to email for semantic correctness
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="Username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Email" // Change placeholder to Email
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)} // Update function to setEmail
                 />
               </div>
               {/* Password Input */}
@@ -78,7 +96,7 @@ const LoginPage: React.FC = () => {
                 type="submit"
                 className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               >
-                Sign In
+                Log In
               </button>
             </form>
             {/* Sign Up Link */}

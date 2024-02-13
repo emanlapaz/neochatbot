@@ -10,12 +10,33 @@ const SignUp: React.FC = () => {
   const [password, setPassword] = useState("");
 
   // Handle form submission
-  const handleSignUp = (event: React.FormEvent) => {
+  const handleSignUp = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Here you would integrate with your authentication service or API to create the user
-    console.log("Signing up with", { username, email, password });
-    // After successful signup, you might want to navigate the user to the login page or directly log them in
-    navigate("/login"); // Redirect user to login page after sign-up
+    try {
+      // Make a POST request to your backend to create a new user
+      const response = await fetch("http://localhost:8000/signup/", {
+        // Adjust your API endpoint accordingly
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, email, password }),
+      });
+
+      if (response.ok) {
+        // Assuming the backend successfully creates a user and returns a success response
+        console.log("Signup successful");
+        navigate("/login"); // Redirect user to login page after successful sign-up
+      } else {
+        // Handle server errors or unsuccessful signup attempts
+        const error = await response.json();
+        console.error("Signup failed:", error.detail);
+        alert("Signup failed: " + error.detail); // Displaying error in alert, consider a more user-friendly error handling
+      }
+    } catch (error) {
+      console.error("An error occurred during signup:", error);
+      alert("An error occurred during signup."); // Displaying error in alert, consider a more user-friendly error handling
+    }
   };
 
   return (

@@ -1,14 +1,26 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import firebase_admin
+from firebase_admin import credentials, auth
+
 
 # Custom Function Imports
 from functions.local_database import save_chat, reset_chat_history
 from functions.openai_requests import get_chat_response
 
+cred = credentials.Certificate("C:\\Users\\eugen\\neochatbot\\backend\\neo-chatbot-e6c8c-firebase-adminsdk-mnv0s-cccccdc3f9.json")
+firebase_admin.initialize_app(cred)
+
+
 # Define Pydantic model for incoming text messages
 class TextMessage(BaseModel):
     text: str
+
+class UserSignupModel(BaseModel):
+    username: str
+    email: str
+    password: str
 
 # Initiate app
 app = FastAPI()
@@ -59,3 +71,17 @@ async def post_text(message: TextMessage):
 
     # Return text response
     return {"user_message": text, "bot_response": chat_response}
+
+# User Signup
+@app.post("/signup/")
+async def signup(user_details: UserSignupModel):
+    print(user_details)
+    try:
+        user_record = auth.create_user(
+            email=user_details.email,
+            password=user_details.password,
+            display_name=user_details.username
+        )
+        return {"uid": user_record.uid, "email": user_record.email}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
