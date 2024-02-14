@@ -6,11 +6,13 @@ from firebase_admin import credentials, auth
 
 
 # Custom Function Imports
-from functions.local_database import save_chat, reset_chat_history
+from functions.firebase_database import save_chat, reset_chat_history
 from functions.openai_requests import get_chat_response
 
 cred = credentials.Certificate("C:\\Users\\eugen\\neochatbot\\backend\\neo-chatbot-e6c8c-firebase-adminsdk-mnv0s-cccccdc3f9.json")
-firebase_admin.initialize_app(cred)
+firebase_admin.initialize_app(cred, {
+    'databaseURL': 'https://neo-chatbot-e6c8c-default-rtdb.europe-west1.firebasedatabase.app/'
+})
 
 
 # Define Pydantic model for incoming text messages
