@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+interface Interest {
+  id: number;
+  name: string;
+  checked: boolean;
+}
+
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
 
@@ -8,11 +14,42 @@ const SignUp: React.FC = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [first_name, setFirstName] = useState("");
+  const [last_name, setLastName] = useState("");
+  const [interests, setInterests] = useState<Interest[]>([
+    { id: 1, name: "Technology", checked: false },
+    { id: 2, name: "Music", checked: false },
+    // Add more interests as needed
+    { id: 3, name: "Gaming", checked: false },
+    { id: 4, name: "Sports", checked: false },
+    { id: 5, name: "Travel", checked: false },
+    { id: 6, name: "Books", checked: false },
+    { id: 7, name: "Movies", checked: false },
+    { id: 8, name: "Fitness", checked: false },
+    { id: 9, name: "Fashion", checked: false },
+    { id: 10, name: "Art", checked: false },
+  ]);
+
+  // Handle checkbox change
+  const handleInterestChange = (id: number) => {
+    setInterests(
+      interests.map((interest) =>
+        interest.id === id
+          ? { ...interest, checked: !interest.checked }
+          : interest
+      )
+    );
+  };
 
   // Handle form submission
   const handleSignUp = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
+      // Filter selected interests
+      const selectedInterests = interests
+        .filter((interest) => interest.checked)
+        .map((interest) => interest.name);
+
       // Make a POST request to your backend to create a new user
       const response = await fetch("http://localhost:8000/signup/", {
         // Adjust your API endpoint accordingly
@@ -20,7 +57,14 @@ const SignUp: React.FC = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({
+          username,
+          email,
+          password,
+          first_name,
+          last_name,
+          interests: selectedInterests,
+        }),
       });
 
       if (response.ok) {
@@ -44,6 +88,26 @@ const SignUp: React.FC = () => {
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
         <h1 className="text-4xl font-bold mb-4 text-center">Sign Up</h1>
         <form onSubmit={handleSignUp} className="space-y-6">
+          <div>
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded-md"
+              placeholder="First Name"
+              value={first_name}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <input
+              type="text"
+              className="w-full p-2 border border-gray-300 rounded-md"
+              placeholder="Last Name"
+              value={last_name}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
           <div>
             <input
               type="text"
@@ -74,6 +138,29 @@ const SignUp: React.FC = () => {
               required
             />
           </div>
+          <fieldset className="mt-4">
+            <legend className="font-semibold">Interests</legend>
+            <div className="grid grid-cols-2 gap-2">
+              {interests.map((interest) => (
+                <div key={interest.id} className="flex items-start">
+                  <input
+                    type="checkbox"
+                    id={`interest-${interest.id}`}
+                    className="mt-1" // Aligns the checkbox with the first line of the label if the label wraps
+                    checked={interest.checked}
+                    onChange={() => handleInterestChange(interest.id)}
+                  />
+                  <label
+                    htmlFor={`interest-${interest.id}`}
+                    className="ml-2 text-sm"
+                  >
+                    {interest.name}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </fieldset>
+
           <button
             type="submit"
             className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"

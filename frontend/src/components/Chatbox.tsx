@@ -1,39 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import Title from "./ChatBoxTitle";
+import { getAuth } from "firebase/auth";
 
 function Chatbox() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([{ sender: "", content: "" }]);
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {}, []);
+
   const sendMessage = async () => {
-    if (!message.trim()) return; // Prevent sending empty messages
+    if (!message.trim()) return;
 
     setIsLoading(true);
     const userMessage = { sender: "user", content: message };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     try {
-      const response = await axios.post(
-        "http://localhost:8000/post-text/",
-        JSON.stringify({ text: message }), // Ensure the payload is correctly structured
-        {
-          headers: {
-            "Content-Type": "application/json", // Set the Content-Type header
-          },
-        }
-      );
-      const botResponse = {
-        sender: "bot",
-        content: response.data.bot_response,
-      };
-      setMessages((prevMessages) => [...prevMessages, botResponse]);
+      const auth = getAuth();
+      const user = auth.currentUser;
+
+      if (user) {
+        // Check if the user is not null
+        const token = await user.getIdToken();
+
+        const response = await axios.post(
+          "http://localhost:8000/post-text/",
+          { text: message }, // Pass the object directly
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+            },
+          }
+        );
+
+        const botResponse = {
+          sender: "bot",
+          content: response.data.bot_response,
+        };
+        setMessages((prevMessages) => [...prevMessages, botResponse]);
+      } else {
+        console.error("No user logged in");
+      }
     } catch (error) {
       console.error("Failed to send message:", error);
     }
 
-    setMessage(""); // Clear the input after sending
+    setMessage("");
     setIsLoading(false);
   };
 

@@ -30,7 +30,7 @@ function Header() {
 
   return (
     <div className="flex justify-between items-center w-full p-6 text-black [font-family:'Maven_Pro-Bold',Helvetica] drop-shadow">
-      <div>Hello User</div>
+      <div>Neo ChatBOt</div>
       <div className="flex justify-between items-center space-x-4">
         {/* Main Page Link */}
         <div

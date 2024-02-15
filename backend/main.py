@@ -1,13 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends  # Add Depends here
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import firebase_admin
-from firebase_admin import credentials, auth
+from firebase_admin import credentials, auth, db
+from typing import List, Optional
 
 
 # Custom Function Imports
 from functions.firebase_database import save_chat, reset_chat_history
 from functions.openai_requests import get_chat_response
+from functions.firebase_authorization import get_current_user
 
 cred = credentials.Certificate("C:\\Users\\eugen\\neochatbot\\backend\\neo-chatbot-e6c8c-firebase-adminsdk-mnv0s-cccccdc3f9.json")
 firebase_admin.initialize_app(cred, {
@@ -23,6 +25,9 @@ class UserSignupModel(BaseModel):
     username: str
     email: str
     password: str
+    first_name: str
+    last_name: str
+    interests: List[str] = []  # List of interests
 
 # Initiate app
 app = FastAPI()
@@ -57,33 +62,36 @@ async def reset_conversation():
 
 # Post text and get response
 @app.post("/post-text/")
-async def post_text(message: TextMessage):
-    # Extract text from the request body
+async def post_text(message: TextMessage, user_id: str = Depends(get_current_user)):
     text = message.text
 
-    # Get GPT response
     chat_response = get_chat_response(text)
-
-    # Guard: ensure there is a response
     if not chat_response:
         raise HTTPException(status_code=400, detail="Failed to get chat response")
     
-    # Store messages
-    save_chat(text, chat_response)
+    # Save messages with the user ID
+    save_chat(user_id, text, chat_response)
 
-    # Return text response
     return {"user_message": text, "bot_response": chat_response}
+
 
 # User Signup
 @app.post("/signup/")
 async def signup(user_details: UserSignupModel):
-    print(user_details)
     try:
         user_record = auth.create_user(
             email=user_details.email,
             password=user_details.password,
             display_name=user_details.username
         )
+
+        db.reference(f'users/{user_record.uid}').set({
+            'username': user_details.username,
+            'first_name': user_details.first_name,
+            'last_name': user_details.last_name,
+            'interests': user_details.interests,
+
+        })
         return {"uid": user_record.uid, "email": user_record.email}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
