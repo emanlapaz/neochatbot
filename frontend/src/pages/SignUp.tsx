@@ -19,7 +19,6 @@ const SignUp: React.FC = () => {
   const [interests, setInterests] = useState<Interest[]>([
     { id: 1, name: "Technology", checked: false },
     { id: 2, name: "Music", checked: false },
-    // Add more interests as needed
     { id: 3, name: "Gaming", checked: false },
     { id: 4, name: "Sports", checked: false },
     { id: 5, name: "Travel", checked: false },
@@ -146,7 +145,7 @@ const SignUp: React.FC = () => {
                   <input
                     type="checkbox"
                     id={`interest-${interest.id}`}
-                    className="mt-1" // Aligns the checkbox with the first line of the label if the label wraps
+                    className="mt-1"
                     checked={interest.checked}
                     onChange={() => handleInterestChange(interest.id)}
                   />
