@@ -43,12 +43,19 @@ const SignUp: React.FC = () => {
   // Handle form submission
   const handleSignUp = async (event: React.FormEvent) => {
     event.preventDefault();
-    try {
-      // Filter selected interests
-      const selectedInterests = interests
-        .filter((interest) => interest.checked)
-        .map((interest) => interest.name);
 
+    // Filter selected interests
+    const selectedInterests = interests
+      .filter((interest) => interest.checked)
+      .map((interest) => interest.name);
+
+    // Ensure that at least one interest is selected
+    if (selectedInterests.length === 0) {
+      alert("Please select at least one interest.");
+      return; // Stop the form submission if no interests are selected
+    }
+
+    try {
       // Make a POST request to your backend to create a new user
       const response = await fetch("http://localhost:8000/signup/", {
         // Adjust your API endpoint accordingly
@@ -62,7 +69,7 @@ const SignUp: React.FC = () => {
           password,
           first_name,
           last_name,
-          interests: selectedInterests,
+          interests: selectedInterests, // This will not be null due to the check above
         }),
       });
 
