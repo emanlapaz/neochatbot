@@ -65,7 +65,7 @@ function PresetGpt() {
         "SportyMate",
         "FanFrenzy",
         "AthleteAlly",
-        "FitnessFanatic",
+        "FitnessFan",
       ];
       return sportsLabels[buttonIndex - 1] || `Button ${buttonIndex}`;
     } else if (interest === "Travel") {
@@ -92,7 +92,7 @@ function PresetGpt() {
         "FitFriend",
         "HealthHero",
         "WorkoutWizard",
-        "ExerciseExpert",
+        "XerciseExpert",
       ];
       return fitnessLabels[buttonIndex - 1] || `Button ${buttonIndex}`;
     } else if (interest === "Fashion") {
@@ -108,7 +108,7 @@ function PresetGpt() {
         "ArtAficionado",
         "CreativeCom",
         "PalettePal",
-        "VisualVirtuoso",
+        "VisualVirto",
       ];
       return artLabels[buttonIndex - 1] || `Button ${buttonIndex}`;
     } else {
