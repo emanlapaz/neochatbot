@@ -1,9 +1,7 @@
 import random
-import json
+from firebase_admin import db
 
-def fetch_latest_chat():
-    local_file = "local_data.json"  # File from which to fetch the message
-
+def fetch_latest_chat(user_id):
     # Preset values for prompt instructions
     voice_name = "Paddy"
     scene = "You are a tour guide in Ireland"
@@ -21,7 +19,6 @@ def fetch_latest_chat():
                     Your name is {voice_name}.
                     Introduce yourself first.
                     Limit your reply with a maximum of 5 sentences.
-                    Do not mention that you are an AI model.
                     {scene}.
                     {personality}.
                     You speak in {dialect}.
@@ -33,21 +30,18 @@ def fetch_latest_chat():
     # Initialize an empty list to store messages, including the initial instruction
     messages = [prompt_instruction]
 
-    # Fetch the last messages from the file
-    try:
-        with open(local_file) as user_file:
-            data = json.load(user_file)  # Load the JSON data from the file
+    # Reference to the user's chats in the Firebase Realtime Database
+    ref = db.reference(f'users/{user_id}/chats')
 
-            # Append the last 5 items of data, or fewer if less than 5 exist
-            messages.extend(data[-5:])  # Adjusted to correctly fetch the last 5 messages
-    except FileNotFoundError:
-        # If the file doesn't exist, handle it gracefully
-        print("File not found. Starting with default prompt instructions.")
-    except json.JSONDecodeError:
-        # Handle empty or invalid JSON file
-        print("JSON decode error. The file may be empty or corrupted.")
+    try:
+        # Assuming you want to fetch the last 5 messages for the user
+        # Modify the path as needed based on your database structure
+        data = ref.order_by_key().limit_to_last(5).get()
+
+        if data:
+            messages.extend(list(data.values()))
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An error occurred while fetching from Firebase: {e}")
 
     # Return the accumulated messages
     return messages

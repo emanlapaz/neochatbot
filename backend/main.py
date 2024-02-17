@@ -65,7 +65,8 @@ async def reset_conversation():
 async def post_text(message: TextMessage, user_id: str = Depends(get_current_user)):
     text = message.text
 
-    chat_response = get_chat_response(text)
+    # Pass user_id to get_chat_response
+    chat_response = get_chat_response(text, user_id)
     if not chat_response:
         raise HTTPException(status_code=400, detail="Failed to get chat response")
     
@@ -73,6 +74,7 @@ async def post_text(message: TextMessage, user_id: str = Depends(get_current_use
     save_chat(user_id, text, chat_response)
 
     return {"user_message": text, "bot_response": chat_response}
+
 
 
 # User Signup
