@@ -31,7 +31,7 @@ function Title({ setMessages }: Props) {
   //add reset button on title
   return (
     <div className="flex justify-between items-center w-full p-2 bg-blue-900 text-white font-bold drop-shadow">
-      <div className="font-bold">NEOChatBot -Title top</div>
+      <div className="font-bold">NEOChatBot -Title</div>
       <button
         onClick={resetConversation} //changes color when mouse hovered icon from heroicons
         className={
@@ -59,9 +59,3 @@ function Title({ setMessages }: Props) {
 }
 
 export default Title;
-
-{
-  /* <div>NeoCHatBot
-<button onClick={resetConversation} className="bg-blue-500">Reset</button>
-</div> */
-}
