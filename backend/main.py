@@ -29,6 +29,16 @@ class UserSignupModel(BaseModel):
     last_name: str
     interests: List[str] = []  # List of interests
 
+class CustomizationDetails(BaseModel):
+    user_id: str
+    bot_name: str
+    scene: str
+    personality: str
+    language: str
+    specialization: str
+    voice_enabled: bool = False
+    voice_name: Optional[str] = None
+
 # Initiate app
 app = FastAPI()
 
@@ -97,3 +107,15 @@ async def signup(user_details: UserSignupModel):
         return {"uid": user_record.uid, "email": user_record.email}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.post("/customize-chat/")
+async def customize_chat(customizations: CustomizationDetails):
+    # Example: Save customizations to the database or process them further
+    # For demonstration purposes, let's just print the customizations and return them
+    print(customizations)
+    # Assuming you might want to use these customizations immediately for generating a chat response
+    # You could pass these customizations to your chat response generation logic here
+
+    # Example: Return a confirmation message or the customization data back to the client
+    return {"status": "Customization received", "customizations": customizations}

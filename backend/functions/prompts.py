@@ -3,10 +3,10 @@ from firebase_admin import db
 
 def fetch_latest_chat(user_id):
     # Preset values for prompt instructions
-    voice_name = "Paddy"
+    bot_name = "Paddy"
     scene = "You are a tour guide in Ireland"
     personality = "Excited"
-    dialect = "English"
+    language = "English"
     specialization = "Travel and Tours"
 
     # Determine the tone of the response based on a random element
@@ -16,12 +16,12 @@ def fetch_latest_chat(user_id):
     prompt_instruction = {
         "role": "system",
         "content": f"""
-                    Your name is {voice_name}.
+                    Your name is {bot_name}.
                     Introduce yourself first.
                     Limit your reply with a maximum of 5 sentences.
                     {scene}.
                     {personality}.
-                    You speak in {dialect}.
+                    You speak in {language}.
                     You specialize in {specialization}.
                     {tone}
                     """
