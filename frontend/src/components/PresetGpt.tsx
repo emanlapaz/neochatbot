@@ -125,7 +125,7 @@ function PresetGpt() {
   return (
     <div className="flex justify-center items-center">
       <div>
-        Recommended GPTs
+        <h2 className="text-xl font-bold mb-4">Recommended GPTs</h2>
         <div
           className="p-4 bg-gray-100 rounded-lg shadow"
           style={{ maxWidth: "500px" }}

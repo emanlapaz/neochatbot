@@ -80,110 +80,114 @@ function CustomBox() {
     }
   };
   return (
-    <form
-      className="p-4 bg-gray-100 rounded-lg shadow"
-      onSubmit={handleSubmit}
-      style={{ maxWidth: "320px" }}
-    >
-      <div className="flex flex-col space-y-4">
-        <label>
-          Bot Name:
-          <input
-            className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
-            placeholder="Bot Name"
-            name="bot_name"
-            value={customizations.bot_name}
-            onChange={handleChange}
-          />
-        </label>
-        <label>
-          Scene:
-          <input
-            className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
-            placeholder="Scene"
-            name="scene"
-            value={customizations.scene}
-            onChange={handleChange}
-          />
-        </label>
-        <label>
-          Personality:
-          <select
-            className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
-            name="personality"
-            value={customizations.personality}
-            onChange={handleChange}
-          >
-            <option value="">Select Personality</option>
-            <option value="Friendly">Friendly</option>
-            <option value="Professional">Professional</option>
-            <option value="Humorous">Humorous</option>
-            <option value="Enthusiastic">Enthusiastic</option>
-            <option value="Informative">Informative</option>
-          </select>
-        </label>
-        <label>
-          Language:
-          <select
-            className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
-            name="language"
-            value={customizations.language}
-            onChange={handleChange}
-          >
-            <option value="">Select Language</option>
-            <option value="English">English</option>
-            <option value="Spanish">Spanish</option>
-            <option value="French">French</option>
-            <option value="German">German</option>
-            <option value="Mandarin">Mandarin</option>
-          </select>
-        </label>
-        <label>
-          Specialization:
-          <input
-            className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
-            placeholder="Specialization"
-            name="specialization"
-            value={customizations.specialization}
-            onChange={handleChange}
-          />
-        </label>
-        <label>
-          Enable Voice:
-          <select
-            className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
-            name="voice_enabled"
-            value={customizations.voice_enabled}
-            onChange={handleChange}
-          >
-            <option value="No">No</option>
-            <option value="Yes">Yes</option>
-          </select>
-        </label>
-        {customizations.voice_enabled === "Yes" && (
+    <div>
+      {" "}
+      <h2 className="text-xl font-bold mb-4">Create</h2>
+      <form
+        className="p-4 bg-gray-100 rounded-lg shadow"
+        onSubmit={handleSubmit}
+        style={{ maxWidth: "320px" }}
+      >
+        <div className="flex flex-col space-y-4">
           <label>
-            Voice Name:
+            Bot Name:
+            <input
+              className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
+              placeholder="Bot Name"
+              name="bot_name"
+              value={customizations.bot_name}
+              onChange={handleChange}
+            />
+          </label>
+          <label>
+            Scene:
+            <input
+              className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
+              placeholder="Scene"
+              name="scene"
+              value={customizations.scene}
+              onChange={handleChange}
+            />
+          </label>
+          <label>
+            Personality:
             <select
               className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
-              name="voice_name"
-              value={customizations.voice_name}
+              name="personality"
+              value={customizations.personality}
               onChange={handleChange}
             >
-              <option value="">Select a Voice</option>
-              <option value="James">James</option>
-              <option value="Mary">Mary</option>
-              {/* Add more voice name options as needed */}
+              <option value="">Select Personality</option>
+              <option value="Friendly">Friendly</option>
+              <option value="Professional">Professional</option>
+              <option value="Humorous">Humorous</option>
+              <option value="Enthusiastic">Enthusiastic</option>
+              <option value="Informative">Informative</option>
             </select>
           </label>
-        )}
-        <button
-          type="submit"
-          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-        >
-          Submit Customization
-        </button>
-      </div>
-    </form>
+          <label>
+            Language:
+            <select
+              className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
+              name="language"
+              value={customizations.language}
+              onChange={handleChange}
+            >
+              <option value="">Select Language</option>
+              <option value="English">English</option>
+              <option value="Spanish">Spanish</option>
+              <option value="French">French</option>
+              <option value="German">German</option>
+              <option value="Mandarin">Mandarin</option>
+            </select>
+          </label>
+          <label>
+            Specialization:
+            <input
+              className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
+              placeholder="Specialization"
+              name="specialization"
+              value={customizations.specialization}
+              onChange={handleChange}
+            />
+          </label>
+          <label>
+            Enable Voice:
+            <select
+              className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
+              name="voice_enabled"
+              value={customizations.voice_enabled}
+              onChange={handleChange}
+            >
+              <option value="No">No</option>
+              <option value="Yes">Yes</option>
+            </select>
+          </label>
+          {customizations.voice_enabled === "Yes" && (
+            <label>
+              Voice Name:
+              <select
+                className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
+                name="voice_name"
+                value={customizations.voice_name}
+                onChange={handleChange}
+              >
+                <option value="">Select a Voice</option>
+                <option value="James">James</option>
+                <option value="Mary">Mary</option>
+                {/* Add more voice name options as needed */}
+              </select>
+            </label>
+          )}
+          <button
+            type="submit"
+            className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+          >
+            Save Chatbot
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
 
