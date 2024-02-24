@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 type Props = {
   setMessages: any;
@@ -12,19 +13,33 @@ function Title({ setMessages }: Props) {
   const resetConversation = async () => {
     setIsResetting(true);
 
-    //reset end point on backend
-    await axios
-      .get("http://localhost:8000/reset")
-      .then((res) => {
-        if (res.status == 200) {
-          setMessages([]); //set messages to empty list when successful
-        } else {
-          console.error("Error on API request backend reset");
-        }
-      })
-      .catch((err) => {
-        console.error(err.message);
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (user) {
+      // Get the ID token
+      user.getIdToken().then((idToken) => {
+        const config = {
+          headers: { Authorization: `Bearer ${idToken}` },
+        };
+
+        axios
+          .get("http://localhost:8000/reset", config)
+          .then((res) => {
+            if (res.status === 200) {
+              setMessages([]); // Set messages to empty list when successful
+            } else {
+              console.error("Error on API request backend reset");
+            }
+          })
+          .catch((err) => {
+            console.error(err.message);
+          });
       });
+    } else {
+      console.error("No user is signed in.");
+    }
+
     setIsResetting(false);
   };
 

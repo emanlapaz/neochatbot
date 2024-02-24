@@ -66,9 +66,11 @@ async def check_health():
 
 # Reset messages
 @app.get("/reset")
-async def reset_conversation():
-    reset_chat_history()
-    return {"message": "Chat History reset"}
+async def reset_conversation(user_id: str = Depends(get_current_user)):
+    # Use the provided user_id to reset the chat history for that specific user
+    reset_chat_history(user_id)
+    return {"message": "Your chat history has been reset."}
+
 
 # Post text and get response
 @app.post("/post-text/")

@@ -25,7 +25,7 @@ def fetch_latest_chat(user_id):
     tone = "Your responses are informative." if random.random() < 0.5 else "Your response will include some humour."
 
     # Construct the initial greeting based on the bot's name
-    initial_greeting = f"Hello! My name is {defaults['bot_name']}. I am a customizable chat bot!"
+    initial_greeting = f"Hello! My name is {defaults['bot_name']}. How can I help you!"
 
     # Initial prompt instructions with dynamic tone and customizations
     prompt_instruction = {

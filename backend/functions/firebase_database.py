@@ -12,8 +12,9 @@ def save_chat(user_id: str, request_message: str, response_message: str):
 
 
 
-def reset_chat_history():
-
-    ref = db.reference('chats')
+def reset_chat_history(user_id: str):
+    # Reference to the specific user's chats
+    user_chats_ref = db.reference(f'users/{user_id}/chats')
     
-    ref.delete()
+    # Delete the user's chats
+    user_chats_ref.delete()
