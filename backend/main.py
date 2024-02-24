@@ -111,11 +111,18 @@ async def signup(user_details: UserSignupModel):
 
 @app.post("/customize-chat/")
 async def customize_chat(customizations: CustomizationDetails):
-    # Example: Save customizations to the database or process them further
-    # For demonstration purposes, let's just print the customizations and return them
-    print(customizations)
-    # Assuming you might want to use these customizations immediately for generating a chat response
-    # You could pass these customizations to your chat response generation logic here
+    try:
+      
+        user_id = customizations.user_id
 
-    # Example: Return a confirmation message or the customization data back to the client
-    return {"status": "Customization received", "customizations": customizations}
+    
+        customizations_dict = customizations.dict()
+
+    
+        del customizations_dict['user_id']
+
+        db.reference(f'users/{user_id}/customizations').set(customizations_dict)
+
+        return {"status": "Customization saved", "customizations": customizations_dict}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to save customizations: {str(e)}")
