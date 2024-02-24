@@ -5,6 +5,7 @@ import Chatbox from "../components/Chatbox";
 import PresetGpt from "../components/PresetGpt";
 import CustomBox from "../components/CustomBox";
 import Welcome from "../components/Welcome";
+import ChatBotList from "../components/ChatBotList";
 
 function Main() {
   return (
@@ -12,8 +13,6 @@ function Main() {
       <Header />
       <div className="pt-4 p-4 flex-1">
         <div className="mb-8">
-          {" "}
-          {/* Add margin-bottom here */}
           <Welcome />
         </div>
         <div className="flex items-start justify-between space-x-4">
@@ -25,7 +24,10 @@ function Main() {
               <CustomBox />
             </div>
           </div>
-          <div className="w-1/3 border-2 border-gray-300 rounded-lg p-4 bg-gray-800">
+          <div className="w-1/3 border-2 border-gray-300 rounded-lg p-4 bg-gray-100">
+            <ChatBotList />
+          </div>
+          <div className="w-2/3 border-2 border-gray-300 rounded-lg p-4 bg-gray-800">
             <Chatbox />
           </div>
         </div>
