@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Chatbox from "../components/Chatbox";
 import PresetGpt from "../components/PresetGpt";
-import CustomBox from "../components/CustomBox";
+import CustomBox from "../components/CreateBot";
 import Welcome from "../components/Welcome";
 import ChatBotList from "../components/ChatBotList";
 

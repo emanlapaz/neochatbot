@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { getAuth } from "firebase/auth";
 
-interface CustomizationState {
+interface CreateBotState {
   bot_name: string;
   scene: string;
   personality: string;
@@ -13,8 +13,8 @@ interface CustomizationState {
   // No need to include user_id here as it's fetched separately
 }
 
-function CustomBox() {
-  const [customizations, setCustomizations] = useState<CustomizationState>({
+function CreateBot() {
+  const [chatbots, setChatbots] = useState<CreateBotState>({
     bot_name: "",
     scene: "",
     personality: "",
@@ -42,7 +42,7 @@ function CustomBox() {
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setCustomizations((prev) => ({ ...prev, [name]: value }));
+    setChatbots((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -53,18 +53,15 @@ function CustomBox() {
     }
 
     const submissionPayload = {
-      ...customizations,
+      ...chatbots,
       user_id: userId, // Include the user_id in the payload
-      voice_enabled: customizations.voice_enabled === "Yes",
-      voice_name:
-        customizations.voice_enabled === "Yes"
-          ? customizations.voice_name
-          : null,
+      voice_enabled: chatbots.voice_enabled === "Yes",
+      voice_name: chatbots.voice_enabled === "Yes" ? chatbots.voice_name : null,
     };
 
     try {
       await axios.post(
-        "http://localhost:8000/customize-chat/",
+        "http://localhost:8000/create-chatbot/",
         submissionPayload,
         {
           headers: {
@@ -74,9 +71,9 @@ function CustomBox() {
         }
       );
 
-      console.log("Customization successful");
+      console.log("Create Bot successful");
     } catch (error) {
-      console.error("Error during customization:", error);
+      console.error("Error during creating bot:", error);
     }
   };
   return (
@@ -95,7 +92,7 @@ function CustomBox() {
               className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
               placeholder="Bot Name"
               name="bot_name"
-              value={customizations.bot_name}
+              value={chatbots.bot_name}
               onChange={handleChange}
             />
           </label>
@@ -105,7 +102,7 @@ function CustomBox() {
               className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
               placeholder="Scene"
               name="scene"
-              value={customizations.scene}
+              value={chatbots.scene}
               onChange={handleChange}
             />
           </label>
@@ -114,7 +111,7 @@ function CustomBox() {
             <select
               className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
               name="personality"
-              value={customizations.personality}
+              value={chatbots.personality}
               onChange={handleChange}
             >
               <option value="">Select Personality</option>
@@ -130,7 +127,7 @@ function CustomBox() {
             <select
               className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
               name="language"
-              value={customizations.language}
+              value={chatbots.language}
               onChange={handleChange}
             >
               <option value="">Select Language</option>
@@ -147,7 +144,7 @@ function CustomBox() {
               className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
               placeholder="Specialization"
               name="specialization"
-              value={customizations.specialization}
+              value={chatbots.specialization}
               onChange={handleChange}
             />
           </label>
@@ -156,20 +153,20 @@ function CustomBox() {
             <select
               className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
               name="voice_enabled"
-              value={customizations.voice_enabled}
+              value={chatbots.voice_enabled}
               onChange={handleChange}
             >
               <option value="No">No</option>
               <option value="Yes">Yes</option>
             </select>
           </label>
-          {customizations.voice_enabled === "Yes" && (
+          {chatbots.voice_enabled === "Yes" && (
             <label>
               Voice Name:
               <select
                 className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
                 name="voice_name"
-                value={customizations.voice_name}
+                value={chatbots.voice_name}
                 onChange={handleChange}
               >
                 <option value="">Select a Voice</option>
@@ -191,4 +188,4 @@ function CustomBox() {
   );
 }
 
-export default CustomBox;
+export default CreateBot;

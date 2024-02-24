@@ -111,20 +111,19 @@ async def signup(user_details: UserSignupModel):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/customize-chat/")
-async def customize_chat(customizations: CustomizationDetails):
+@app.post("/create-chatbot/")
+async def create_chatbot(chatbots: CustomizationDetails, user_id: str = Depends(get_current_user)):
     try:
-      
-        user_id = customizations.user_id
+        # Convert Pydantic model to dict excluding 'user_id'
+        chatbots_dict = chatbots.dict(exclude={'user_id'})
+        
+        # Push the new chatbot data under the user's 'chatbots' collection, generating a unique chatbot ID
+        new_chatbot_ref = db.reference(f'users/{user_id}/chatbots').push(chatbots_dict)
+        
+        # The key of the newly created chatbot is its unique ID
+        chatbot_id = new_chatbot_ref.key
 
-    
-        customizations_dict = customizations.dict()
-
-    
-        del customizations_dict['user_id']
-
-        db.reference(f'users/{user_id}/customizations').set(customizations_dict)
-
-        return {"status": "Customization saved", "customizations": customizations_dict}
+        return {"status": "Customization saved", "chatbot_id": chatbot_id, "chatbots": chatbots_dict}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to save customizations: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to save chatbot: {str(e)}")
+
