@@ -6,6 +6,7 @@ import PresetGpt from "../components/PresetGpt";
 import CustomBox from "../components/CreateBot";
 import Welcome from "../components/Welcome";
 import ChatBotList from "../components/ChatBotList";
+import { ChatbotProvider } from "../components/ChatbotContext";
 
 function Main() {
   return (
@@ -24,12 +25,14 @@ function Main() {
               <CustomBox />
             </div>
           </div>
-          <div className="w-1/3 border-2 border-gray-300 rounded-lg p-4 bg-gray-100">
-            <ChatBotList />
-          </div>
-          <div className="w-2/3 border-2 border-gray-300 rounded-lg p-4 bg-gray-800">
-            <Chatbox />
-          </div>
+          <ChatbotProvider>
+            <div className="w-1/3 border-2 border-gray-300 rounded-lg p-4 bg-gray-100">
+              <ChatBotList />
+            </div>
+            <div className="w-2/3 border-2 border-gray-300 rounded-lg p-4 bg-gray-800">
+              <Chatbox />
+            </div>
+          </ChatbotProvider>
         </div>
       </div>
       <Footer />

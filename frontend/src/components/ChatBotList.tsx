@@ -8,6 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref, onValue } from "firebase/database";
+import { useChatbot } from "./ChatbotContext";
 
 interface Chatbot {
   id: string;
@@ -40,6 +41,8 @@ function ChatBotList() {
     }
   };
 
+  const { setChatbotId } = useChatbot();
+
   useEffect(() => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -71,6 +74,7 @@ function ChatBotList() {
   };
 
   const loadChatbotDetails = async (chatbotId: string) => {
+    setChatbotId(chatbotId);
     try {
       const auth = getAuth();
       if (!auth.currentUser) {

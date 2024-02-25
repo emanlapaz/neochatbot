@@ -2,11 +2,13 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Title from "./ChatBoxTitle";
 import { getAuth } from "firebase/auth";
+import { useChatbot } from "./ChatbotContext";
 
 function Chatbox() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([{ sender: "", content: "" }]);
   const [isLoading, setIsLoading] = useState(false);
+  const { chatbotId } = useChatbot();
 
   useEffect(() => {}, []);
 
@@ -27,11 +29,11 @@ function Chatbox() {
 
         const response = await axios.post(
           "http://localhost:8000/post-text/",
-          { text: message }, // Pass the object directly
+          { text: message, chatbotId: chatbotId }, // Include the chatbotId in the request body
           {
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+              Authorization: `Bearer ${token}`,
             },
           }
         );

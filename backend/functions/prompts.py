@@ -1,7 +1,7 @@
 import random
 from firebase_admin import db
 
-def fetch_latest_chat(user_id):
+def fetch_latest_chat(user_id, chatbot_id):
     # Default values for prompt instructions
     defaults = {
         "bot_name": "Neo",
@@ -11,21 +11,21 @@ def fetch_latest_chat(user_id):
         "specialization": "General Knowledge"
     }
 
-    # Fetch customization details from Firebase
-    customization_ref = db.reference(f'users/{user_id}/customizations')
-    customizations = customization_ref.get()
+    # Fetch chatbot details from Firebase for the specific chatbot
+    chatbot_ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}')
+    chatbots = chatbot_ref.get()
 
     # If there are customizations, override the default values
-    if customizations:
+    if chatbots:
         for key in defaults.keys():
-            if key in customizations:
-                defaults[key] = customizations[key]
+            if key in chatbots:
+                defaults[key] = chatbots[key]
 
     # Determine the tone of the response based on a random element
     tone = "Your responses are informative." if random.random() < 0.5 else "Your response will include some humour."
 
     # Construct the initial greeting based on the bot's name
-    initial_greeting = f"Hello! My name is {defaults['bot_name']}. How can I help you!"
+    initial_greeting = f"Hello! My name is {defaults['bot_name']}. How can I help you today?"
 
     # Initial prompt instructions with dynamic tone and customizations
     prompt_instruction = {
@@ -43,11 +43,11 @@ def fetch_latest_chat(user_id):
     # Initialize an empty list to store messages, including the initial instruction
     messages = [prompt_instruction]
 
-    # Reference to the user's chats in the Firebase Realtime Database
-    ref = db.reference(f'users/{user_id}/chats')
+    # Reference to the specific chatbot's chats in the Firebase Realtime Database
+    ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}/chats')
 
     try:
-        # Fetch the last 5 messages for the user
+        # Fetch the last 5 messages for the user and specific chatbot
         data = ref.order_by_key().limit_to_last(5).get()
 
         if data:

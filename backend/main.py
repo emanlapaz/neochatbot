@@ -19,6 +19,7 @@ firebase_admin.initialize_app(cred, {
 
 class TextMessage(BaseModel):
     text: str
+    chatbotId: str  # Add the chatbotId field
 
 class UserSignupModel(BaseModel):
     username: str
@@ -75,12 +76,16 @@ async def reset_conversation(user_id: str = Depends(get_current_user)):
 @app.post("/post-text/")
 async def post_text(message: TextMessage, user_id: str = Depends(get_current_user)):
     text = message.text
+    chatbot_id = message.chatbotId  # Extract the chatbotId from the request
 
-    chat_response = get_chat_response(text, user_id)
+    # Use the chatbot_id along with the text to get a response.
+    # This function needs to be implemented based on your application's logic.
+    chat_response = get_chat_response(text, user_id, chatbot_id)
     if not chat_response:
         raise HTTPException(status_code=400, detail="Failed to get chat response")
     
-    save_chat(user_id, text, chat_response)
+    # Assuming save_chat can handle chatbot_id if needed
+    save_chat(user_id, text, chat_response, chatbot_id)
 
     return {"user_message": text, "bot_response": chat_response}
 
