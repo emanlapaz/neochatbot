@@ -29,7 +29,7 @@ class UserSignupModel(BaseModel):
     last_name: str
     interests: List[str] = []  # List of interests
 
-class CustomizationDetails(BaseModel):
+class ChatbotDetails(BaseModel):
     user_id: str
     bot_name: str
     scene: str
@@ -112,7 +112,7 @@ async def signup(user_details: UserSignupModel):
 
 
 @app.post("/create-chatbot/")
-async def create_chatbot(chatbots: CustomizationDetails, user_id: str = Depends(get_current_user)):
+async def create_chatbot(chatbots: ChatbotDetails, user_id: str = Depends(get_current_user)):
     try:
         # Convert Pydantic model to dict excluding 'user_id'
         chatbots_dict = chatbots.dict(exclude={'user_id'})
