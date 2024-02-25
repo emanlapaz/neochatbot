@@ -70,6 +70,31 @@ function ChatBotList() {
     setOpenPlaceholderId(null);
   };
 
+  const loadChatbotDetails = async (chatbotId: string) => {
+    try {
+      const auth = getAuth();
+      if (!auth.currentUser) {
+        throw new Error("No user is currently signed in.");
+      }
+      const userToken = await auth.currentUser.getIdToken(true);
+      const response = await fetch("http://localhost:8000/load-chatbot/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ chatbot_id: chatbotId }),
+      });
+      if (!response.ok) {
+        throw new Error("Failed to load chatbot details");
+      }
+      const details = await response.json();
+      console.log(details); // Process chatbot details as needed
+    } catch (error) {
+      console.error("Error loading chatbot:", error);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -93,11 +118,9 @@ function ChatBotList() {
               </div>
               <div className="flex items-center">
                 <button
-                  onClick={() => {
-                    /* Handler function to do something when robot icon is clicked */
-                  }}
+                  onClick={() => loadChatbotDetails(chatbot.id)}
                   className="bg-gray-200 text-sm p-1 rounded flex items-center justify-center mr-2"
-                  title="Load Chatbot" // Tooltip added here
+                  title="Load Chatbot"
                 >
                   <span className="ml-1">
                     <FontAwesomeIcon icon={faArrowRightFromBracket} />

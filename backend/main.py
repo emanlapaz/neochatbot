@@ -17,7 +17,6 @@ firebase_admin.initialize_app(cred, {
 })
 
 
-# Define Pydantic model for incoming text messages
 class TextMessage(BaseModel):
     text: str
 
@@ -67,7 +66,7 @@ async def check_health():
 # Reset messages
 @app.get("/reset")
 async def reset_conversation(user_id: str = Depends(get_current_user)):
-    # Use the provided user_id to reset the chat history for that specific user
+
     reset_chat_history(user_id)
     return {"message": "Your chat history has been reset."}
 
@@ -77,12 +76,10 @@ async def reset_conversation(user_id: str = Depends(get_current_user)):
 async def post_text(message: TextMessage, user_id: str = Depends(get_current_user)):
     text = message.text
 
-    # Pass user_id to get_chat_response
     chat_response = get_chat_response(text, user_id)
     if not chat_response:
         raise HTTPException(status_code=400, detail="Failed to get chat response")
     
-    # Save messages with the user ID
     save_chat(user_id, text, chat_response)
 
     return {"user_message": text, "bot_response": chat_response}
@@ -114,16 +111,27 @@ async def signup(user_details: UserSignupModel):
 @app.post("/create-chatbot/")
 async def create_chatbot(chatbots: ChatbotDetails, user_id: str = Depends(get_current_user)):
     try:
-        # Convert Pydantic model to dict excluding 'user_id'
         chatbots_dict = chatbots.dict(exclude={'user_id'})
         
-        # Push the new chatbot data under the user's 'chatbots' collection, generating a unique chatbot ID
         new_chatbot_ref = db.reference(f'users/{user_id}/chatbots').push(chatbots_dict)
         
-        # The key of the newly created chatbot is its unique ID
         chatbot_id = new_chatbot_ref.key
 
         return {"status": "Customization saved", "chatbot_id": chatbot_id, "chatbots": chatbots_dict}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save chatbot: {str(e)}")
 
+@app.post("/load-chatbot/")
+async def load_chatbot(data: dict, user_id: str = Depends(get_current_user)):
+    chatbot_id = data.get("chatbot_id")
+    if not chatbot_id:
+        raise HTTPException(status_code=400, detail="Chatbot ID is required")
+    
+    try:
+        chatbot_ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}')
+        chatbot_details = chatbot_ref.get()
+        if not chatbot_details:
+            raise HTTPException(status_code=404, detail="Chatbot not found")
+        return chatbot_details
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to load chatbot: {str(e)}")
