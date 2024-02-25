@@ -4,6 +4,7 @@ from pydantic import BaseModel
 import firebase_admin
 from firebase_admin import credentials, auth, db
 from typing import List, Optional
+from fastapi.responses import JSONResponse
 
 
 # Custom Function Imports
@@ -71,6 +72,21 @@ async def reset_conversation(user_id: str = Depends(get_current_user)):
     reset_chat_history(user_id)
     return {"message": "Your chat history has been reset."}
 
+
+@app.get("/get-bot-name/{chatbot_id}")
+
+async def get_bot_name(chatbot_id: str, user_id: str = Depends(get_current_user)):
+    try:
+        chatbot_ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}')
+
+        chatbot_details = chatbot_ref.get()
+
+        bot_name = chatbot_details.get("bot_name") if chatbot_details else "Neo"
+
+        return JSONResponse(content={"bot_name": bot_name})
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve bot name: {str(e)}")
 
 # Post text and get response
 @app.post("/post-text/")

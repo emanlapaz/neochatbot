@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useChatbot } from "./ChatbotContext"; // Import the useChatbot hook
 
 type Props = {
   setMessages: any;
@@ -8,6 +9,34 @@ type Props = {
 
 function Title({ setMessages }: Props) {
   const [isResetting, setIsResetting] = useState(false);
+  const [botName, setBotName] = useState("Loading bot..."); // Default text while loading
+  const { chatbotId } = useChatbot(); // Retrieve chatbotId from ChatbotContext
+
+  useEffect(() => {
+    const auth = getAuth();
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        user.getIdToken().then((idToken) => {
+          const config = {
+            headers: { Authorization: `Bearer ${idToken}` },
+          };
+
+          // Fetch bot name using chatbotId
+          axios
+            .get(`http://localhost:8000/get-bot-name/${chatbotId}`, config)
+            .then((res) => {
+              if (res.status === 200 && res.data.bot_name) {
+                setBotName(res.data.bot_name); // Set the bot name from response
+              }
+            })
+            .catch((err) => {
+              console.error(err.message);
+              setBotName("Bot name load error"); // Error fallback
+            });
+        });
+      }
+    });
+  }, [chatbotId]); // Watch for changes in chatbotId
 
   //Reset the conversation
   const resetConversation = async () => {
@@ -17,25 +46,22 @@ function Title({ setMessages }: Props) {
     const user = auth.currentUser;
 
     if (user) {
-      // Get the ID token
-      user.getIdToken().then((idToken) => {
+      try {
+        const idToken = await user.getIdToken();
         const config = {
           headers: { Authorization: `Bearer ${idToken}` },
         };
 
-        axios
-          .get("http://localhost:8000/reset", config)
-          .then((res) => {
-            if (res.status === 200) {
-              setMessages([]); // Set messages to empty list when successful
-            } else {
-              console.error("Error on API request backend reset");
-            }
-          })
-          .catch((err) => {
-            console.error(err.message);
-          });
-      });
+        const response = await axios.get("http://localhost:8000/reset", config);
+        if (response.status === 200) {
+          setMessages([]); // Set messages to empty list when successful
+        } else {
+          console.error("Error on API request backend reset");
+        }
+      } catch (error: any) {
+        // Specify the type of 'error'
+        console.error(error.message);
+      }
     } else {
       console.error("No user is signed in.");
     }
@@ -43,10 +69,10 @@ function Title({ setMessages }: Props) {
     setIsResetting(false);
   };
 
-  //add reset button on title
+  // Add reset button on title
   return (
     <div className="flex justify-between items-center w-full p-2 bg-blue-900 text-white font-bold drop-shadow">
-      <div className="font-bold">NEOChatBot -Title</div>
+      <div className="font-bold">{botName}</div>
       <button
         onClick={resetConversation} //changes color when mouse hovered icon from heroicons
         className={
@@ -58,13 +84,13 @@ function Title({ setMessages }: Props) {
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
-          stroke-width="1.5"
+          strokeWidth="1.5"
           stroke="currentColor"
           className="w-6 h-6"
         >
           <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
+            strokeLinecap="round"
+            strokeLinejoin="round"
             d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
           />
         </svg>
