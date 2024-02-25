@@ -45,25 +45,30 @@ function Title({ setMessages }: Props) {
     const auth = getAuth();
     const user = auth.currentUser;
 
-    if (user) {
+    if (user && chatbotId) {
+      // Ensure chatbotId is not null or undefined
       try {
         const idToken = await user.getIdToken();
         const config = {
           headers: { Authorization: `Bearer ${idToken}` },
         };
 
-        const response = await axios.get("http://localhost:8000/reset", config);
+        // Append the chatbotId as a query parameter
+        const response = await axios.get(
+          `http://localhost:8000/reset?chatbot_id=${chatbotId}`,
+          config
+        );
         if (response.status === 200) {
-          setMessages([]); // Set messages to empty list when successful
+          setMessages([]); // Clear the messages upon successful reset
         } else {
           console.error("Error on API request backend reset");
         }
       } catch (error: any) {
-        // Specify the type of 'error'
-        console.error(error.message);
+        // Handle any errors
+        console.error(error.response?.data?.detail || error.message); // Improved error logging
       }
     } else {
-      console.error("No user is signed in.");
+      console.error("No user is signed in or chatbotId is missing.");
     }
 
     setIsResetting(false);

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends  # Add Depends here
+from fastapi import FastAPI, HTTPException, Depends, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import firebase_admin
@@ -66,11 +66,18 @@ async def check_health():
     return {"message": "NeoChatBot! is Healthy"}
 
 # Reset messages
-@app.get("/reset")
-async def reset_conversation(user_id: str = Depends(get_current_user)):
 
-    reset_chat_history(user_id)
-    return {"message": "Your chat history has been reset."}
+@app.get("/reset")
+async def reset_conversation(user_id: str = Depends(get_current_user), chatbot_id: str = Query(None)):
+    # Check if chatbot_id is provided
+    if chatbot_id is None:
+        # If no chatbot_id is provided, you might want to reset all chats for the user
+        # or handle the request differently based on your application's requirements.
+        raise HTTPException(status_code=400, detail="Chatbot ID is required for resetting chat history.")
+    else:
+        # Reset chat history for the specified chatbot
+        reset_chat_history(user_id, chatbot_id)
+        return {"message": f"Chat history for chatbot {chatbot_id} has been reset."}
 
 
 @app.get("/get-bot-name/{chatbot_id}")
