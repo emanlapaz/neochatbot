@@ -99,6 +99,32 @@ function ChatBotList() {
     }
   };
 
+  const deleteChatbot = async (chatbotId: string) => {
+    try {
+      const auth = getAuth();
+      if (!auth.currentUser) {
+        throw new Error("No user is currently signed in.");
+      }
+      const userToken = await auth.currentUser.getIdToken(true);
+      const response = await fetch(
+        `http://localhost:8000/delete-chatbot/${chatbotId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to delete chatbot");
+      }
+      // Remove chatbot from state
+      setChatbots(chatbots.filter((chatbot) => chatbot.id !== chatbotId));
+    } catch (error) {
+      console.error("Error deleting chatbot:", error);
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -165,7 +191,11 @@ function ChatBotList() {
                   <button className="mr-6">
                     <FontAwesomeIcon icon={faEdit} style={{ color: "green" }} />
                   </button>
-                  <button>
+                  <button
+                    onClick={() => deleteChatbot(chatbot.id)}
+                    className="mr-6"
+                    title="Delete Chatbot"
+                  >
                     <FontAwesomeIcon
                       icon={faTrashAlt}
                       style={{ color: "red" }}

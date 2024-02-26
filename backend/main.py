@@ -163,3 +163,20 @@ async def load_chatbot(data: dict, user_id: str = Depends(get_current_user)):
         return chatbot_details
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to load chatbot: {str(e)}")
+    
+@app.delete("/delete-chatbot/{chatbot_id}")
+async def delete_chatbot(chatbot_id: str, user_id: str = Depends(get_current_user)):
+    try:
+        # Reference to the user's chatbot
+        chatbot_ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}')
+        
+        # Check if the chatbot exists before attempting to delete
+        if not chatbot_ref.get():
+            return JSONResponse(status_code=404, content={"message": "Chatbot not found"})
+        
+        # Delete the chatbot
+        chatbot_ref.delete()
+        
+        return {"message": f"Chatbot {chatbot_id} successfully deleted."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to delete chatbot: {str(e)}")
