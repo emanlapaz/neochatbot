@@ -7,8 +7,9 @@ import {
   faArrowRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import { getAuth } from "firebase/auth";
-import { getDatabase, ref, onValue } from "firebase/database";
+import { getDatabase, ref, onValue, update } from "firebase/database";
 import { useChatbot } from "./ChatbotContext";
+import ChatbotEditForm from "./ChatbotEditForm";
 
 interface Chatbot {
   id: string;
@@ -30,6 +31,28 @@ function ChatBotList() {
   const [openChatHistoryId, setOpenChatHistoryId] = useState<string | null>(
     null
   );
+  const [editingChatbotId, setEditingChatbotId] = useState<string | null>(null);
+
+  const toggleEditForm = (id: string) => {
+    setEditingChatbotId(editingChatbotId === id ? null : id);
+    setOpenPlaceholderId(null); // Close placeholders when editing
+    setOpenChatbotId(null); // Close details view when editing
+  };
+
+  const handleChatbotUpdate = async (id: string, updatedChatbot: Chatbot) => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const db = getDatabase();
+      const chatbotRef = ref(db, `users/${user.uid}/chatbots/${id}`);
+      await update(chatbotRef, updatedChatbot)
+        .then(() => {
+          setEditingChatbotId(null); // Close the edit form on successful update
+          // Optionally, you can refresh the chatbots list or update it locally
+        })
+        .catch((error: any) => console.error("Error updating chatbot:", error));
+    }
+  };
 
   const toggleChatHistory = (id: string) => {
     if (openChatHistoryId === id) {
@@ -125,6 +148,23 @@ function ChatBotList() {
     }
   };
 
+  if (editingChatbotId) {
+    const chatbotToEdit = chatbots.find(
+      (chatbot) => chatbot.id === editingChatbotId
+    );
+    if (chatbotToEdit) {
+      return (
+        <ChatbotEditForm
+          chatbot={chatbotToEdit}
+          onSave={(updatedChatbot) =>
+            handleChatbotUpdate(editingChatbotId, updatedChatbot)
+          }
+          onCancel={() => setEditingChatbotId(null)} // Pass the onCancel prop
+        />
+      );
+    }
+  }
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -187,10 +227,16 @@ function ChatBotList() {
                 <p>Language: {chatbot.language}</p>
                 <p>Specialization: {chatbot.specialization}</p>
                 <p>Voice Enabled: {chatbot.voice_enabled ? "Yes" : "No"}</p>
+
                 <div className="flex justify-end items-end mt-4">
-                  <button className="mr-6">
+                  <button
+                    onClick={() => toggleEditForm(chatbot.id)}
+                    className="mr-6"
+                    title="Edit Chatbot"
+                  >
                     <FontAwesomeIcon icon={faEdit} style={{ color: "green" }} />
                   </button>
+
                   <button
                     onClick={() => deleteChatbot(chatbot.id)}
                     className="mr-6"
