@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged, Auth } from "firebase/auth";
-import { ref, onValue, getDatabase, Database } from "firebase/database";
+import { ref, onValue, getDatabase, Database, push } from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 
 interface ChatbotConfig {
+  id: string; // Ensure there's an ID or some unique identifier for each config
   bot_name: string;
   language: string;
   personality: string;
@@ -17,6 +18,7 @@ const PresetGpt: React.FC = () => {
   const [interests, setInterests] = useState<string[]>([]);
   const [chatbotConfigs, setChatbotConfigs] = useState<ChatbotConfig[]>([]);
   const [openInterest, setOpenInterest] = useState<string | null>(null);
+  const [openBotDetail, setOpenBotDetail] = useState<string | null>(null); // State to track which chatbot's details are open
 
   useEffect(() => {
     const auth: Auth = getAuth();
@@ -33,8 +35,6 @@ const PresetGpt: React.FC = () => {
             setInterests([]);
           }
         });
-      } else {
-        console.log("User not signed in or user data not available");
       }
     });
   }, []);
@@ -46,10 +46,41 @@ const PresetGpt: React.FC = () => {
     onValue(chatbotRef, (snapshot) => {
       const data = snapshot.val();
       if (data) {
-        const configs = Object.keys(data).map((key) => data[key]);
+        const configs = Object.keys(data).map((key) => ({
+          id: key,
+          ...data[key],
+        }));
         setChatbotConfigs(configs);
       } else {
         setChatbotConfigs([]);
+      }
+    });
+  };
+
+  const toggleBotDetails = (botId: string): void => {
+    if (openBotDetail === botId) {
+      setOpenBotDetail(null);
+    } else {
+      setOpenBotDetail(botId);
+    }
+  };
+
+  const handleAddBotClick = (config: ChatbotConfig): void => {
+    const auth: Auth = getAuth();
+    const database: Database = getDatabase();
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const userChatbotsRef = ref(database, `users/${user.uid}/chatbots`);
+        push(userChatbotsRef, config)
+          .then(() => {
+            console.log("Chatbot added successfully");
+          })
+          .catch((error) => {
+            console.error("Error adding chatbot:", error);
+          });
+      } else {
+        console.log("User not signed in or user data not available");
       }
     });
   };
@@ -59,31 +90,46 @@ const PresetGpt: React.FC = () => {
       <div className="w-full max-w-md p-4 bg-gray-100 rounded-lg shadow">
         <h2 className="text-xl font-bold mb-4">Recommended GPTs</h2>
         <div className="flex flex-col space-y-2">
-          {interests.length > 0 ? (
-            interests.map((interest, index) => (
-              <div key={index} className="text-center">
-                <button
-                  className="w-full bg-gray-300 p-2 rounded text-gray-800 flex justify-center cursor-pointer"
-                  onClick={() => handleInterestClick(interest)}
-                >
-                  {interest}
-                </button>
-                {openInterest === interest &&
-                  chatbotConfigs.map((config, configIndex) => (
-                    <button
-                      key={configIndex}
-                      className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full flex justify-center items-center"
-                      onClick={() => {
-                        console.log(`Selected bot: ${config.bot_name}`);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                      {config.bot_name}
-                    </button>
-                  ))}
-              </div>
-            ))
-          ) : (
+          {interests.map((interest, index) => (
+            <div key={index} className="text-center">
+              <button
+                className="w-full bg-gray-300 p-2 rounded text-gray-800 flex justify-center cursor-pointer"
+                onClick={() => handleInterestClick(interest)}
+              >
+                {interest}
+              </button>
+              {openInterest === interest &&
+                chatbotConfigs.map((config, configIndex) => (
+                  <div key={configIndex} className="mt-2">
+                    <div className="flex justify-between items-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">
+                      <span>{config.bot_name}</span>
+                      <FontAwesomeIcon
+                        icon={faEllipsisH}
+                        className="cursor-pointer"
+                        onClick={() => toggleBotDetails(config.id)}
+                      />
+                    </div>
+                    {openBotDetail === config.id && (
+                      <div className="text-left p-2 bg-gray-200 rounded mt-2">
+                        <p>Language: {config.language}</p>
+                        <p>Personality: {config.personality}</p>
+                        <p>Scene: {config.scene}</p>
+                        <p>Specialization: {config.specialization}</p>
+                        <p>Voice Enabled: {config.voice_enabled}</p>
+                        <button
+                          className="mt-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full"
+                          onClick={() => handleAddBotClick(config)}
+                        >
+                          <FontAwesomeIcon icon={faPlus} className="mr-2" />
+                          Add to My Chatbots
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+            </div>
+          ))}
+          {interests.length === 0 && (
             <div className="text-gray-800">No interests found</div>
           )}
         </div>
