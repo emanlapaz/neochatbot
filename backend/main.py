@@ -101,13 +101,10 @@ async def post_text(message: TextMessage, user_id: str = Depends(get_current_use
     text = message.text
     chatbot_id = message.chatbotId  # Extract the chatbotId from the request
 
-    # Use the chatbot_id along with the text to get a response.
-    # This function needs to be implemented based on your application's logic.
     chat_response = get_chat_response(text, user_id, chatbot_id)
     if not chat_response:
         raise HTTPException(status_code=400, detail="Failed to get chat response")
     
-    # Assuming save_chat can handle chatbot_id if needed
     save_chat(user_id, text, chat_response, chatbot_id)
 
     return {"user_message": text, "bot_response": chat_response}

@@ -2,34 +2,85 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Title from "./ChatBoxTitle";
 import { getAuth } from "firebase/auth";
+import { getDatabase, ref, onValue, push } from "firebase/database";
 import { useChatbot } from "./ChatbotContext";
+
+interface Message {
+  sender: string;
+  content: string;
+  timestamp?: string; // Optionally include timestamp if you plan to display or sort by it
+}
 
 function Chatbox() {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([{ sender: "", content: "" }]);
+  const [messages, setMessages] = useState<{
+    userMessages: Message[];
+    assistantMessages: Message[];
+  }>({
+    userMessages: [],
+    assistantMessages: [],
+  });
   const [isLoading, setIsLoading] = useState(false);
   const { chatbotId } = useChatbot();
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user && chatbotId) {
+      const userId = user.uid;
+      const db = getDatabase();
+      const chatHistoryRef = ref(
+        db,
+        `users/${userId}/chatbots/${chatbotId}/chats`
+      );
+
+      onValue(chatHistoryRef, (snapshot) => {
+        const chats = snapshot.val() || {};
+        const userMessages: Message[] = [];
+        const assistantMessages: Message[] = [];
+
+        Object.keys(chats).forEach((key) => {
+          const chat = chats[key];
+          const formattedMessage: Message = {
+            sender: chat.sender,
+            content: chat.content,
+            timestamp: chat.timestamp,
+          };
+
+          if (chat.sender === "user") {
+            userMessages.push(formattedMessage);
+          } else if (chat.sender === "bot") {
+            assistantMessages.push(formattedMessage);
+          }
+        });
+
+        setMessages({ userMessages, assistantMessages });
+      });
+    }
+  }, [chatbotId]);
 
   const sendMessage = async () => {
     if (!message.trim()) return;
-
     setIsLoading(true);
-    const userMessage = { sender: "user", content: message };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    const userMessage = {
+      sender: "user",
+      content: message,
+      timestamp: new Date().toISOString(), // Add current timestamp
+    };
 
     try {
       const auth = getAuth();
       const user = auth.currentUser;
+      if (user && chatbotId) {
+        const userId = user.uid;
+        const db = getDatabase();
+        const chatRef = ref(db, `users/${userId}/chatbots/${chatbotId}/chats`);
+        await push(chatRef, userMessage);
 
-      if (user) {
-        // Check if the user is not null
         const token = await user.getIdToken();
-
         const response = await axios.post(
           "http://localhost:8000/post-text/",
-          { text: message, chatbotId: chatbotId }, // Include the chatbotId in the request body
+          { text: message, chatbotId },
           {
             headers: {
               "Content-Type": "application/json",
@@ -38,48 +89,68 @@ function Chatbox() {
           }
         );
 
-        const botResponse = {
-          sender: "bot",
-          content: response.data.bot_response,
-        };
-        setMessages((prevMessages) => [...prevMessages, botResponse]);
-      } else {
-        console.error("No user logged in");
+        if (response.data.bot_response) {
+          const botMessage = {
+            sender: "bot",
+            content: response.data.bot_response,
+            timestamp: new Date().toISOString(), // Add current timestamp for bot message
+          };
+          await push(chatRef, botMessage);
+        }
       }
     } catch (error) {
       console.error("Failed to send message:", error);
+    } finally {
+      setMessage(""); // Clear the input field
+      setIsLoading(false); // Reset loading state
     }
-
-    setMessage("");
-    setIsLoading(false);
   };
 
   return (
     <div className="h-screen overflow-y-hidden bg-black">
       <Title setMessages={setMessages} />
-      <div className="flex flex-col justify-between h-5/6 overflow-y-scroll p-4">
-        {messages.map((msg, index) => (
-          <div
-            key={index}
-            className={`message ${
-              msg.sender === "user" ? "text-right" : "text-left"
-            }`}
-          >
-            <p
-              className={`message-content ${
-                msg.sender === "user"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-500 text-white"
-              } rounded-lg inline-block p-2 m-1`}
+      <div className="flex flex-col h-5/6 overflow-y-scroll p-4 gap-2">
+        {[...messages.userMessages, ...messages.assistantMessages]
+          .sort((a, b) => {
+            const dateA = a.timestamp ? new Date(a.timestamp) : null;
+            const dateB = b.timestamp ? new Date(b.timestamp) : null;
+            if (!dateA && !dateB) return 0; // If both timestamps are null
+            if (!dateA) return 1; // If A is null, place it after B
+            if (!dateB) return -1; // If B is null, place it after A
+            return dateA.getTime() - dateB.getTime();
+          })
+          .map((msg, index) => (
+            <div
+              key={index}
+              className={`flex w-full ${
+                msg.sender === "user" ? "justify-end" : "justify-start"
+              }`}
             >
-              {msg.content}
-            </p>
-          </div>
-        ))}
+              <div className="flex flex-col">
+                <p
+                  className={`message-content ${
+                    msg.sender === "user" ? "bg-blue-500" : "bg-gray-500"
+                  } text-white rounded-lg p-2`}
+                >
+                  {msg.content}
+                </p>
+                <span className="text-gray-400 text-xs">
+                  {msg.timestamp &&
+                    new Date(msg.timestamp).toLocaleDateString("en-GB", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                </span>
+              </div>
+            </div>
+          ))}
         {isLoading && (
-          <p className="text-center  text-white">Waiting for reply...</p>
+          <div className="flex justify-center">
+            <p className="text-white">Waiting for reply...</p>
+          </div>
         )}
       </div>
+
       <div className="p-4">
         <input
           type="text"
