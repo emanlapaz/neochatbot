@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { getAuth, onAuthStateChanged, Auth } from "firebase/auth";
-import { ref, onValue, getDatabase, Database, push } from "firebase/database";
+import {
+  ref,
+  onValue,
+  getDatabase,
+  Database,
+  push,
+  set,
+} from "firebase/database";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 
@@ -72,9 +79,15 @@ const PresetGpt: React.FC = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const userChatbotsRef = ref(database, `users/${user.uid}/chatbots`);
-        push(userChatbotsRef, config)
+        const newChatbotRef = push(userChatbotsRef); // This creates a new reference with a unique ID
+        set(newChatbotRef, {
+          ...config,
+          id: newChatbotRef.key, // Use Firebase-generated unique key as the chatbot ID
+        })
           .then(() => {
-            console.log("Chatbot added successfully");
+            console.log(
+              "Chatbot added successfully with Firebase-generated ID"
+            );
           })
           .catch((error) => {
             console.error("Error adding chatbot:", error);
@@ -110,7 +123,7 @@ const PresetGpt: React.FC = () => {
                       />
                     </div>
                     {openBotDetail === config.id && (
-                      <div className="text-left p-2 bg-gray-200 rounded mt-2">
+                      <div className="text-left text-sm p-2 bg-gray-200 rounded mt-2">
                         <p>Language: {config.language}</p>
                         <p>Personality: {config.personality}</p>
                         <p>Scene: {config.scene}</p>
@@ -121,7 +134,7 @@ const PresetGpt: React.FC = () => {
                           onClick={() => handleAddBotClick(config)}
                         >
                           <FontAwesomeIcon icon={faPlus} className="mr-2" />
-                          Add to My Chatbots
+                          Add to ChatBot List
                         </button>
                       </div>
                     )}
