@@ -6,6 +6,7 @@ import PresetGpt from "../components/PresetGpt";
 import CustomBox from "../components/CreateBot";
 import Welcome from "../components/Welcome";
 import ChatBotList from "../components/ChatBotList";
+import RecordChat from "../components/RecordChat";
 import { ChatbotProvider } from "../components/ChatbotContext";
 
 function Main() {
@@ -32,6 +33,7 @@ function Main() {
             </div>
             <div className="w-2/3 border-2 border-gray-300 rounded-lg p-4 bg-gray-800">
               <Chatbox />
+              <RecordChat handleStop={undefined} />
             </div>
           </div>
         </div>

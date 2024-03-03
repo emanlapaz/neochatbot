@@ -8,7 +8,7 @@ import { useChatbot } from "./ChatbotContext";
 interface Message {
   sender: string;
   content: string;
-  timestamp?: string; // Optionally include timestamp if you plan to display or sort by it
+  timestamp?: string;
 }
 
 function Chatbox() {

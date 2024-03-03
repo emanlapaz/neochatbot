@@ -214,7 +214,6 @@ function ChatBotList() {
                 <p>
                   <strong>Chat History:</strong>
                 </p>
-                {/* Placeholder for chat history or other dynamic content */}
               </div>
             )}
             {openChatbotId === chatbot.id && (

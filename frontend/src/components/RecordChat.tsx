@@ -40,5 +40,3 @@ function RecordChat({ handleStop }: Props) {
 }
 
 export default RecordChat;
-
-//"bg-white p-4 rounded-full"

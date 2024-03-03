@@ -10,7 +10,6 @@ interface Interest {
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
 
-  // State for the sign-up form fields
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -29,7 +28,6 @@ const SignUp: React.FC = () => {
     { id: 10, name: "Art", checked: false },
   ]);
 
-  // Handle checkbox change
   const handleInterestChange = (id: number) => {
     setInterests(
       interests.map((interest) =>
@@ -40,25 +38,20 @@ const SignUp: React.FC = () => {
     );
   };
 
-  // Handle form submission
   const handleSignUp = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Filter selected interests
     const selectedInterests = interests
       .filter((interest) => interest.checked)
       .map((interest) => interest.name);
 
-    // Ensure that at least one interest is selected
     if (selectedInterests.length === 0) {
       alert("Please select at least one interest.");
-      return; // Stop the form submission if no interests are selected
+      return;
     }
 
     try {
-      // Make a POST request to your backend to create a new user
       const response = await fetch("http://localhost:8000/signup/", {
-        // Adjust your API endpoint accordingly
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,23 +62,21 @@ const SignUp: React.FC = () => {
           password,
           first_name,
           last_name,
-          interests: selectedInterests, // This will not be null due to the check above
+          interests: selectedInterests,
         }),
       });
 
       if (response.ok) {
-        // Assuming the backend successfully creates a user and returns a success response
         console.log("Signup successful");
-        navigate("/login"); // Redirect user to login page after successful sign-up
+        navigate("/login");
       } else {
-        // Handle server errors or unsuccessful signup attempts
         const error = await response.json();
         console.error("Signup failed:", error.detail);
-        alert("Signup failed: " + error.detail); // Displaying error in alert, consider a more user-friendly error handling
+        alert("Signup failed: " + error.detail);
       }
     } catch (error) {
       console.error("An error occurred during signup:", error);
-      alert("An error occurred during signup."); // Displaying error in alert, consider a more user-friendly error handling
+      alert("An error occurred during signup.");
     }
   };
 
