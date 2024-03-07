@@ -53,8 +53,8 @@ function Chatbox() {
     }
   }, [chatbotId]);
 
-  const sendMessage = async () => {
-    if (!message.trim()) return;
+  const sendMessage = async (message: string) => {
+    if (!message.trim()) return; // Ensure there is a message to send
     setIsLoading(true);
     const userMessage = {
       sender: "user",
@@ -74,7 +74,7 @@ function Chatbox() {
         const token = await user.getIdToken();
         const response = await axios.post(
           "http://localhost:8000/post-text/",
-          { text: message, chatbotId },
+          { text: message, chatbotId }, // Use the message parameter here
           {
             headers: {
               "Content-Type": "application/json",
@@ -95,7 +95,6 @@ function Chatbox() {
     } catch (error) {
       console.error("Failed to send message:", error);
     } finally {
-      setMessage(""); // Clear the input field
       setIsLoading(false); // Reset loading state
     }
   };
@@ -111,17 +110,13 @@ function Chatbox() {
 
       const axiosResponse = await axios.post(
         "http://localhost:8000/post-audio",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data", // Ensure correct content type for form-data
-          },
-        }
+        formData
       );
       const messageDecoded = axiosResponse.data.message;
 
       if (messageDecoded) {
-        console.log(messageDecoded); // Success: Log or use the decoded message as needed
+        console.log(messageDecoded); // Optionally log the decoded message
+        sendMessage(messageDecoded); // Send the decoded message
       } else {
         console.log("No decoded message received from the backend.");
       }
@@ -181,14 +176,15 @@ function Chatbox() {
           onChange={(e) => setMessage(e.target.value)}
           className="w-full border border-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:border-blue-500 mr-2"
           placeholder="Type your message here..."
-          onKeyPress={(e) => e.key === "Enter" && sendMessage()}
+          onKeyPress={(e) => e.key === "Enter" && sendMessage(message)} // Adjusted here
         />
         <button
-          onClick={sendMessage}
+          onClick={() => sendMessage(message)} // Adjusted here
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Send
         </button>
+
         <RecordChat handleStop={handleAudioStop} />
       </div>
     </div>
