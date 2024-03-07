@@ -103,29 +103,33 @@ function Chatbox() {
   const handleAudioStop = async (blobUrl: string) => {
     setIsLoading(true);
 
-    const myMessage = { sender: "me", blobUrl };
+    try {
+      const response = await fetch(blobUrl);
+      const blob = await response.blob();
+      const formData = new FormData();
+      formData.append("file", blob, "myFile.wav");
 
-    fetch(blobUrl)
-      .then((res) => res.blob())
-      .then(async (blob) => {
-        const formData = new FormData();
-        formData.append("file", blob, "myFile.wav");
-        await axios
-          .post("http://localhost:8000/post-audio", formData, {
-            headers: {
-              "Content-Type": "audio/mpeg",
-            },
-            responseType: "arraybuffer", // Set the response type to handle binary data
-          })
-          .then((res: any) => {
-            const blob = res.data;
-            const audio = new Audio();
-          })
-          .catch((err: any) => {
-            console.error(err);
-            setIsLoading(false);
-          });
-      });
+      const axiosResponse = await axios.post(
+        "http://localhost:8000/post-audio",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Ensure correct content type for form-data
+          },
+        }
+      );
+      const messageDecoded = axiosResponse.data.message;
+
+      if (messageDecoded) {
+        console.log(messageDecoded); // Success: Log or use the decoded message as needed
+      } else {
+        console.log("No decoded message received from the backend.");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -196,4 +196,6 @@ async def post_audio(file: UploadFile = File(...)):
     if not message_decoded:
         raise HTTPException(status_code=400, detail="Failed to decode audio")
     
-    return(message_decoded)
+    return {"message": message_decoded}
+
+
