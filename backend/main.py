@@ -1,16 +1,18 @@
-from fastapi import FastAPI, HTTPException, Depends, Query, UploadFile, File
+from fastapi import FastAPI, HTTPException, Depends, Query, UploadFile, File, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import firebase_admin
 from firebase_admin import credentials, auth, db
 from typing import List, Optional
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
+import requests
 
 
 # Custom Function Imports
 from functions.firebase_database import save_chat, reset_chat_history
 from functions.openai_requests import get_chat_response, convert_audio_to_text
 from functions.firebase_authorization import get_current_user
+from functions.text_to_speech import convert_text_to_speech
 
 cred = credentials.Certificate("C:\\Users\\eugen\\neochatbot\\backend\\neo-chatbot-e6c8c-firebase-adminsdk-mnv0s-cccccdc3f9.json")
 firebase_admin.initialize_app(cred, {
@@ -39,6 +41,9 @@ class ChatbotDetails(BaseModel):
     specialization: str
     voice_enabled: bool = False
     voice_name: Optional[str] = None
+
+class TextToSpeechRequest(BaseModel):
+    text: str
 
 # Initiate app
 app = FastAPI()
@@ -199,3 +204,15 @@ async def post_audio(file: UploadFile = File(...)):
     return {"message": message_decoded}
 
 
+@app.post("/convert-text-to-speech/")
+async def text_to_speech_endpoint(request: TextToSpeechRequest):
+    audio_output = convert_text_to_speech(request.text)
+    
+    if not audio_output:
+        raise HTTPException(status_code=400, detail="Failed audio output")
+    
+    def iterfile():
+        yield audio_output
+
+    # Return output audio as a streaming response
+    return StreamingResponse(iterfile(), media_type="application/octet-stream")

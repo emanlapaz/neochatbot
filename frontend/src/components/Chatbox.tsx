@@ -90,10 +90,33 @@ function Chatbox() {
             timestamp: new Date().toISOString(),
           };
           await push(chatRef, botMessage);
+
+          // Convert bot's response to speech and stream the audio
+          const audioResponse = await fetch(
+            "http://localhost:8000/convert-text-to-speech/",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                // Add Authorization header if your /convert-text-to-speech/ endpoint requires it
+              },
+              body: JSON.stringify({ text: response.data.bot_response }),
+            }
+          );
+
+          if (!audioResponse.ok) {
+            throw new Error("Failed to convert text to speech.");
+          }
+
+          // Play the streamed audio response
+          const audioBlob = await audioResponse.blob();
+          const audioUrl = URL.createObjectURL(audioBlob);
+          const audio = new Audio(audioUrl);
+          audio.play();
         }
       }
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error("Failed to send message or convert text to speech:", error);
     } finally {
       setIsLoading(false); // Reset loading state
     }
