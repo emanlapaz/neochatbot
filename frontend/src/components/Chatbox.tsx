@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Title from "./ChatBoxTitle";
+import RecordChat from "./RecordChat"; // Make sure you have this component set up for recording
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref, onValue, push } from "firebase/database";
 import { useChatbot } from "./ChatbotContext";
@@ -16,10 +17,7 @@ function Chatbox() {
   const [messages, setMessages] = useState<{
     userMessages: Message[];
     assistantMessages: Message[];
-  }>({
-    userMessages: [],
-    assistantMessages: [],
-  });
+  }>({ userMessages: [], assistantMessages: [] });
   const [isLoading, setIsLoading] = useState(false);
   const { chatbotId } = useChatbot();
 
@@ -33,12 +31,10 @@ function Chatbox() {
         db,
         `users/${userId}/chatbots/${chatbotId}/chats`
       );
-
       onValue(chatHistoryRef, (snapshot) => {
         const chats = snapshot.val() || {};
         const userMessages: Message[] = [];
         const assistantMessages: Message[] = [];
-
         Object.keys(chats).forEach((key) => {
           const chat = chats[key];
           const formattedMessage: Message = {
@@ -46,14 +42,12 @@ function Chatbox() {
             content: chat.content,
             timestamp: chat.timestamp,
           };
-
           if (chat.sender === "user") {
             userMessages.push(formattedMessage);
           } else if (chat.sender === "bot") {
             assistantMessages.push(formattedMessage);
           }
         });
-
         setMessages({ userMessages, assistantMessages });
       });
     }
@@ -65,7 +59,7 @@ function Chatbox() {
     const userMessage = {
       sender: "user",
       content: message,
-      timestamp: new Date().toISOString(), // Add current timestamp
+      timestamp: new Date().toISOString(),
     };
 
     try {
@@ -93,7 +87,7 @@ function Chatbox() {
           const botMessage = {
             sender: "bot",
             content: response.data.bot_response,
-            timestamp: new Date().toISOString(), // Add current timestamp for bot message
+            timestamp: new Date().toISOString(),
           };
           await push(chatRef, botMessage);
         }
@@ -106,18 +100,44 @@ function Chatbox() {
     }
   };
 
+  const handleAudioStop = async (blobUrl: string) => {
+    setIsLoading(true);
+
+    const myMessage = { sender: "me", blobUrl };
+
+    fetch(blobUrl)
+      .then((res) => res.blob())
+      .then(async (blob) => {
+        const formData = new FormData();
+        formData.append("file", blob, "myFile.wav");
+        await axios
+          .post("http://localhost:8000/post-audio", formData, {
+            headers: {
+              "Content-Type": "audio/mpeg",
+            },
+            responseType: "arraybuffer", // Set the response type to handle binary data
+          })
+          .then((res: any) => {
+            const blob = res.data;
+            const audio = new Audio();
+          })
+          .catch((err: any) => {
+            console.error(err);
+            setIsLoading(false);
+          });
+      });
+  };
+
   return (
     <div className="h-screen overflow-y-hidden bg-black">
       <Title setMessages={setMessages} />
       <div className="flex flex-col h-5/6 overflow-y-scroll p-4 gap-2">
+        {/* Messages display */}
         {[...messages.userMessages, ...messages.assistantMessages]
           .sort((a, b) => {
             const dateA = a.timestamp ? new Date(a.timestamp) : null;
             const dateB = b.timestamp ? new Date(b.timestamp) : null;
-            if (!dateA && !dateB) return 0; // If both timestamps are null
-            if (!dateA) return 1; // If A is null, place it after B
-            if (!dateB) return -1; // If B is null, place it after A
-            return dateA.getTime() - dateB.getTime();
+            return dateA && dateB ? dateA.getTime() - dateB.getTime() : 0;
           })
           .map((msg, index) => (
             <div
@@ -150,22 +170,22 @@ function Chatbox() {
           </div>
         )}
       </div>
-
-      <div className="p-4">
+      <div className="p-4 flex justify-between items-center">
         <input
           type="text"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          className="w-full border border-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:border-blue-500"
+          className="w-full border border-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:border-blue-500 mr-2"
           placeholder="Type your message here..."
           onKeyPress={(e) => e.key === "Enter" && sendMessage()}
         />
         <button
           onClick={sendMessage}
-          className="mt-2 w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Send
         </button>
+        <RecordChat handleStop={handleAudioStop} />
       </div>
     </div>
   );

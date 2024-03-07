@@ -33,7 +33,6 @@ function Main() {
             </div>
             <div className="w-2/3 border-2 border-gray-300 rounded-lg p-4 bg-gray-800">
               <Chatbox />
-              <RecordChat handleStop={undefined} />
             </div>
           </div>
         </div>

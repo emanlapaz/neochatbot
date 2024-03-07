@@ -5,34 +5,34 @@ type Props = {
   handleStop: any;
 };
 
-//record function and pass on button
 function RecordChat({ handleStop }: Props) {
   return (
     <ReactMediaRecorder
       audio
       onStop={handleStop}
-      render={({ status, startRecording, stopRecording }) => (
+      render={({ status, startRecording, stopRecording, error }) => (
         <div className="mt-2 flex flex-col items-center">
-          {" "}
-          {/* Added flex properties */}
           <button
             onMouseDown={startRecording}
             onMouseUp={stopRecording}
-            className={
-              status === "recording"
-                ? "bg-red-500 p-4 rounded-full"
-                : "bg-white p-4 rounded-full"
+            onKeyDown={(e) => e.key === "Space" && startRecording()}
+            onKeyUp={(e) => e.key === "Space" && stopRecording()}
+            aria-label={
+              status === "recording" ? "Stop recording" : "Start recording"
             }
+            className={`p-1 rounded-full ${
+              status === "recording" ? "bg-red-500" : "bg-white"
+            }`}
           >
             <MicroPhoneIcon
-              classText={
+              classText={`${
                 status === "recording"
-                  ? "animate-pulse text-black-500"
+                  ? "animate-pulse text-black"
                   : "text-sky-500"
-              }
+              }`}
             />
           </button>
-          {/* Audio message */}
+          {error && <p className="text-red-500">Error: {error}</p>}
         </div>
       )}
     />

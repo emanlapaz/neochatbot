@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Query
+from fastapi import FastAPI, HTTPException, Depends, Query, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import firebase_admin
@@ -9,7 +9,7 @@ from fastapi.responses import JSONResponse
 
 # Custom Function Imports
 from functions.firebase_database import save_chat, reset_chat_history
-from functions.openai_requests import get_chat_response
+from functions.openai_requests import get_chat_response, convert_audio_to_text
 from functions.firebase_authorization import get_current_user
 
 cred = credentials.Certificate("C:\\Users\\eugen\\neochatbot\\backend\\neo-chatbot-e6c8c-firebase-adminsdk-mnv0s-cccccdc3f9.json")
@@ -177,3 +177,21 @@ async def delete_chatbot(chatbot_id: str, user_id: str = Depends(get_current_use
         return {"message": f"Chatbot {chatbot_id} successfully deleted."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete chatbot: {str(e)}")
+
+@app.post("/post-audio/")
+async def post_audio(file: UploadFile = File(...)):
+
+    # Convert audio to text - production
+    # Save the file temporarily
+    with open(file.filename, "wb") as buffer:
+        buffer.write(file.file.read())
+    audio_input = open(file.filename, "rb")
+
+    # Decode audio
+    message_decoded = convert_audio_to_text(audio_input)
+
+    print(message_decoded)
+
+    # Guard: Ensure output
+    if not message_decoded:
+        raise HTTPException(status_code=400, detail="Failed to decode audio")
