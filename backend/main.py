@@ -165,9 +165,17 @@ async def load_chatbot(data: dict, user_id: str = Depends(get_current_user)):
         chatbot_details = chatbot_ref.get()
         if not chatbot_details:
             raise HTTPException(status_code=404, detail="Chatbot not found")
+
+        # Optionally, check for voice_id in chatbot details for debugging or logging
+        if "voice_id" in chatbot_details:
+            print(f"Voice ID: {chatbot_details['voice_id']} found for chatbot: {chatbot_id}")
+        else:
+            print(f"No Voice ID found for chatbot: {chatbot_id}")
+
         return chatbot_details
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to load chatbot: {str(e)}")
+
     
 @app.delete("/delete-chatbot/{chatbot_id}")
 async def delete_chatbot(chatbot_id: str, user_id: str = Depends(get_current_user)):

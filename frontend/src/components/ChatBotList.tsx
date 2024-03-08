@@ -19,6 +19,8 @@ interface Chatbot {
   language: string;
   specialization: string;
   voice_enabled: boolean;
+  voice_id?: string; // Add this line to include the voice_id property
+  voice_name?: string; // Optional: include the voice_name property, mark as optional if it might not be present
 }
 
 function ChatBotList() {
@@ -35,8 +37,8 @@ function ChatBotList() {
 
   const toggleEditForm = (id: string) => {
     setEditingChatbotId(editingChatbotId === id ? null : id);
-    setOpenPlaceholderId(null); // Close placeholders when editing
-    setOpenChatbotId(null); // Close details view when editing
+    setOpenPlaceholderId(null);
+    setOpenChatbotId(null);
   };
 
   const handleChatbotUpdate = async (id: string, updatedChatbot: Chatbot) => {
@@ -47,8 +49,7 @@ function ChatBotList() {
       const chatbotRef = ref(db, `users/${user.uid}/chatbots/${id}`);
       await update(chatbotRef, updatedChatbot)
         .then(() => {
-          setEditingChatbotId(null); // Close the edit form on successful update
-          // Optionally, you can refresh the chatbots list or update it locally
+          setEditingChatbotId(null);
         })
         .catch((error: any) => console.error("Error updating chatbot:", error));
     }
@@ -96,8 +97,8 @@ function ChatBotList() {
     setOpenPlaceholderId(null);
   };
 
-  const loadChatbotDetails = async (chatbotId: string) => {
-    setChatbotId(chatbotId);
+  const loadChatbotDetails = async (chatbotId: string, voiceId: string) => {
+    setChatbotId(chatbotId); // Context setting for chatbot details loading
     try {
       const auth = getAuth();
       if (!auth.currentUser) {
@@ -110,13 +111,16 @@ function ChatBotList() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${userToken}`,
         },
-        body: JSON.stringify({ chatbot_id: chatbotId }),
+        body: JSON.stringify({
+          chatbot_id: chatbotId,
+          voice_id: voiceId, // Now includes the voice_id
+        }),
       });
       if (!response.ok) {
         throw new Error("Failed to load chatbot details");
       }
       const details = await response.json();
-      console.log(details); // Process chatbot details as needed
+      console.log(details); // Process the received chatbot details as needed
     } catch (error) {
       console.error("Error loading chatbot:", error);
     }
@@ -141,7 +145,7 @@ function ChatBotList() {
       if (!response.ok) {
         throw new Error("Failed to delete chatbot");
       }
-      // Remove chatbot from state
+
       setChatbots(chatbots.filter((chatbot) => chatbot.id !== chatbotId));
     } catch (error) {
       console.error("Error deleting chatbot:", error);
@@ -159,7 +163,7 @@ function ChatBotList() {
           onSave={(updatedChatbot) =>
             handleChatbotUpdate(editingChatbotId, updatedChatbot)
           }
-          onCancel={() => setEditingChatbotId(null)} // Pass the onCancel prop
+          onCancel={() => setEditingChatbotId(null)}
         />
       );
     }
@@ -188,7 +192,12 @@ function ChatBotList() {
               </div>
               <div className="flex items-center">
                 <button
-                  onClick={() => loadChatbotDetails(chatbot.id)}
+                  onClick={() =>
+                    loadChatbotDetails(
+                      chatbot.id,
+                      chatbot.voice_id || "defaultVoiceId"
+                    )
+                  }
                   className="bg-gray-200 text-sm p-1 rounded flex items-center justify-center mr-2"
                   title="Load Chatbot"
                 >
