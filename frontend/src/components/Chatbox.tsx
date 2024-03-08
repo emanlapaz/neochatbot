@@ -20,6 +20,7 @@ function Chatbox() {
   }>({ userMessages: [], assistantMessages: [] });
   const [isLoading, setIsLoading] = useState(false);
   const { chatbotId } = useChatbot();
+  const [voiceId, setVoiceId] = useState<string | null>(null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -27,6 +28,8 @@ function Chatbox() {
     if (user && chatbotId) {
       const userId = user.uid;
       const db = getDatabase();
+
+      // Fetch chat history
       const chatHistoryRef = ref(
         db,
         `users/${userId}/chatbots/${chatbotId}/chats`
@@ -50,11 +53,24 @@ function Chatbox() {
         });
         setMessages({ userMessages, assistantMessages });
       });
+
+      // Fetch chatbot data including voice_id
+      const chatbotRef = ref(db, `users/${userId}/chatbots/${chatbotId}`);
+      onValue(chatbotRef, (snapshot) => {
+        const chatbotData = snapshot.val();
+        if (chatbotData) {
+          const voiceId = chatbotData.voice_id;
+          console.log("Voice ID:", voiceId);
+          setVoiceId(voiceId);
+        } else {
+          console.log("Chatbot data not found.");
+        }
+      });
     }
   }, [chatbotId]);
 
-  const sendMessage = async (message: string) => {
-    if (!message.trim()) return; // Ensure there is a message to send
+  const sendMessage = async (message: string, voiceId: string | null) => {
+    if (!message.trim()) return;
     setIsLoading(true);
     const userMessage = {
       sender: "user",
@@ -100,7 +116,10 @@ function Chatbox() {
                 "Content-Type": "application/json",
                 // Add Authorization header if your /convert-text-to-speech/ endpoint requires it
               },
-              body: JSON.stringify({ text: response.data.bot_response }),
+              body: JSON.stringify({
+                text: response.data.bot_response,
+                voice_id: voiceId, // Pass voiceId here
+              }),
             }
           );
 
@@ -138,8 +157,9 @@ function Chatbox() {
       const messageDecoded = axiosResponse.data.message;
 
       if (messageDecoded) {
-        console.log(messageDecoded); // Optionally log the decoded message
-        sendMessage(messageDecoded); // Send the decoded message
+        console.log(messageDecoded);
+        // Assuming voiceId is available in the scope
+        sendMessage(messageDecoded, voiceId);
       } else {
         console.log("No decoded message received from the backend.");
       }
@@ -199,10 +219,10 @@ function Chatbox() {
           onChange={(e) => setMessage(e.target.value)}
           className="w-full border border-gray-400 rounded-lg px-3 py-2 focus:outline-none focus:ring focus:border-blue-500 mr-2"
           placeholder="Type your message here..."
-          onKeyPress={(e) => e.key === "Enter" && sendMessage(message)} // Adjusted here
+          onKeyPress={(e) => e.key === "Enter" && sendMessage(message, voiceId)}
         />
         <button
-          onClick={() => sendMessage(message)} // Adjusted here
+          onClick={() => sendMessage(message, voiceId)} // Adjusted here
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Send

@@ -46,6 +46,7 @@ class ChatbotDetails(BaseModel):
 
 class TextToSpeechRequest(BaseModel):
     text: str
+    voice_id: Optional[str] = None
 
 # Initiate app
 app = FastAPI()
@@ -217,7 +218,7 @@ async def post_audio(file: UploadFile = File(...)):
 
 @app.post("/convert-text-to-speech/")
 async def text_to_speech_endpoint(request: TextToSpeechRequest):
-    audio_output = convert_text_to_speech(request.text)
+    audio_output = convert_text_to_speech(request.text, request.voice_id)
     
     if not audio_output:
         raise HTTPException(status_code=400, detail="Failed audio output")

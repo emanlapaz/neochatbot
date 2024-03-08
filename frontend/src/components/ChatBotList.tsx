@@ -120,7 +120,7 @@ function ChatBotList() {
         throw new Error("Failed to load chatbot details");
       }
       const details = await response.json();
-      console.log(details); // Process the received chatbot details as needed
+      console.log(details);
     } catch (error) {
       console.error("Error loading chatbot:", error);
     }

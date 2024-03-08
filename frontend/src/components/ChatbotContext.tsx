@@ -1,32 +1,34 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
-// Define the context shape
 interface ChatbotContextType {
   chatbotId: string | null;
   setChatbotId: (id: string | null) => void;
+  voiceId: string | null; // This remains correctly declared for optional use
+  setVoiceId: (id: string | null) => void;
 }
 
-// Create the context with an empty initial value
 const ChatbotContext = createContext<ChatbotContextType | undefined>(undefined);
 
 interface ChatbotProviderProps {
-  children: ReactNode; // Define the children prop
+  children: ReactNode; // Correctly defined for children props
 }
 
-// Create a provider component
 export const ChatbotProvider: React.FC<ChatbotProviderProps> = ({
   children,
 }) => {
   const [chatbotId, setChatbotId] = useState<string | null>(null);
+  const [voiceId, setVoiceId] = useState<string | null>(null);
 
+  // Corrected to include voiceId and setVoiceId in the context value
   return (
-    <ChatbotContext.Provider value={{ chatbotId, setChatbotId }}>
+    <ChatbotContext.Provider
+      value={{ chatbotId, setChatbotId, voiceId, setVoiceId }}
+    >
       {children}
     </ChatbotContext.Provider>
   );
 };
 
-// Custom hook to use the context
 export const useChatbot = () => {
   const context = useContext(ChatbotContext);
   if (context === undefined) {
