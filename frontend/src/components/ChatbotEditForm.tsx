@@ -2,6 +2,13 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 
+// VoiceOption interface to describe each voice option
+interface VoiceOption {
+  voice_id: string;
+  name: string;
+}
+
+// Chatbot interface updated to optionally include voice_id
 interface Chatbot {
   id: string;
   bot_name: string;
@@ -11,8 +18,10 @@ interface Chatbot {
   specialization: string;
   voice_enabled: boolean;
   voice_name?: string;
+  voice_id?: string;
 }
 
+// ChatbotEditFormProps interface for props expected by the ChatbotEditForm component
 interface ChatbotEditFormProps {
   chatbot: Chatbot;
   onSave: (chatbot: Chatbot) => void;
@@ -24,6 +33,7 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
   onSave,
   onCancel,
 }) => {
+  // State hooks for form fields
   const [scene, setScene] = useState(chatbot.scene);
   const [personality, setPersonality] = useState(chatbot.personality);
   const [language, setLanguage] = useState(chatbot.language);
@@ -31,17 +41,27 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
   const [voiceEnabled, setVoiceEnabled] = useState(
     chatbot.voice_enabled ?? false
   );
+  const [voiceId, setVoiceId] = useState(chatbot.voice_id);
 
-  const [voiceName, setVoiceName] = useState(chatbot.voice_name);
+  // State for voice options
+  const [voiceOptions] = useState<VoiceOption[]>([
+    { voice_id: "EXAVITQu4vr4xnSDxMaL", name: "Sarah" },
+    { voice_id: "GBv7mTt0atIp3Br8iCZE", name: "Thomas" },
+    { voice_id: "IKne3meq5aSn9XLyUdCD", name: "Charlie" },
+    { voice_id: "LcfcDJNUP1GQjkzn1xUU", name: "Emily" },
+    { voice_id: "MF3mGyEYCl7XYWbV9V6O", name: "Elli" },
+    { voice_id: "N2lVS1w4EtoT3dr4eOWO", name: "Callum" },
+  ]);
 
+  // Handle change in form fields
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
     const { name, value, type } = e.target;
     if (name === "voice_enabled") {
-      // Specifically check if the event target is an input element and its type is checkbox
-      const target = e.target as HTMLInputElement; // Cast to HTMLInputElement to access 'checked'
-      setVoiceEnabled(target.checked);
+      setVoiceEnabled(!voiceEnabled);
+    } else if (name === "voice_id") {
+      setVoiceId(value);
     } else {
       switch (name) {
         case "scene":
@@ -56,15 +76,12 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
         case "specialization":
           setSpecialization(value);
           break;
-        case "voice_name":
-          setVoiceName(value);
-          break;
-        default:
-          break;
+        // Additional cases as needed
       }
     }
   };
 
+  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
@@ -74,11 +91,11 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
       language,
       specialization,
       voice_enabled: voiceEnabled,
-      // Set voice_name to null or an empty string if voiceEnabled is false
-      voice_name: voiceEnabled ? voiceName : "",
+      voice_name: voiceOptions.find((option) => option.voice_id === voiceId)
+        ?.name,
+      voice_id: voiceEnabled ? voiceId : undefined,
     });
   };
-
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">
@@ -171,32 +188,30 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
             Voice Name:
             <select
               className="bg-gray-300 p-2 rounded text-gray-800 mt-1 block w-full"
-              name="voice_name"
-              value={voiceName || ""}
+              name="voice_id"
+              value={voiceId || ""}
               onChange={handleChange}
             >
               <option value="">Select a Voice</option>
-              <option value="James">James</option>
-              <option value="Mary">Mary</option>
-              {/* Add more voice name options as needed */}
+              {voiceOptions.map((option) => (
+                <option key={option.voice_id} value={option.voice_id}>
+                  {option.name}
+                </option>
+              ))}
             </select>
           </label>
         )}
-
         <div className="flex justify-center space-x-2 mt-4">
-          {/* Save Button */}
           <button
             type="submit"
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
           >
             <FontAwesomeIcon icon={faSave} className="mr-2" /> Save
           </button>
-
-          {/* Cancel Button */}
           <button
-            type="button" // Ensure this is 'button' to prevent form submission
-            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-            onClick={onCancel} // Call the onCancel function when clicked
+            type="button"
+            className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700"
+            onClick={onCancel}
           >
             Cancel
           </button>
@@ -205,5 +220,4 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
     </div>
   );
 };
-
 export default ChatbotEditForm;

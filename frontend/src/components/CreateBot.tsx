@@ -10,10 +10,14 @@ interface CreateBotState {
   specialization: string;
   voice_enabled: string;
   voice_name: string;
-  // No need to include user_id here as it's fetched separately
 }
 
-function CreateBot() {
+interface VoiceOption {
+  voice_id: string;
+  name: string;
+}
+
+const CreateBot: React.FC = () => {
   const [chatbots, setChatbots] = useState<CreateBotState>({
     bot_name: "",
     scene: "",
@@ -24,6 +28,15 @@ function CreateBot() {
     voice_name: "",
   });
 
+  const [voiceOptions, setVoiceOptions] = useState<VoiceOption[]>([
+    { voice_id: "EXAVITQu4vr4xnSDxMaL", name: "Sarah" },
+    { voice_id: "GBv7mTt0atIp3Br8iCZE", name: "Thomas" },
+    { voice_id: "IKne3meq5aSn9XLyUdCD", name: "Charlie" },
+    { voice_id: "LcfcDJNUP1GQjkzn1xUU", name: "Emily" },
+    { voice_id: "MF3mGyEYCl7XYWbV9V6O", name: "Elli" },
+    { voice_id: "N2lVS1w4EtoT3dr4eOWO", name: "Callum" },
+  ]);
+
   const [userToken, setUserToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null); // State to hold the user ID
 
@@ -33,7 +46,7 @@ function CreateBot() {
       if (user) {
         const token = await user.getIdToken();
         setUserToken(token);
-        setUserId(user.uid); // Set the user ID when the auth state changes
+        setUserId(user.uid);
       }
     });
   }, []);
@@ -52,12 +65,23 @@ function CreateBot() {
       return;
     }
 
+    const selectedVoiceOption = voiceOptions.find(
+      (option) => option.voice_id === chatbots.voice_name
+    );
+
     const submissionPayload = {
       ...chatbots,
-      user_id: userId, // Include the user_id in the payload
+      user_id: userId,
       voice_enabled: chatbots.voice_enabled === "Yes",
-      voice_name: chatbots.voice_enabled === "Yes" ? chatbots.voice_name : null,
+      // Use the selected voice option to set voice_id and voice_name. If voice is not enabled, set them to null.
+      voice_id:
+        chatbots.voice_enabled === "Yes" ? selectedVoiceOption?.voice_id : null,
+      voice_name:
+        chatbots.voice_enabled === "Yes" ? selectedVoiceOption?.name : null,
     };
+    console.log(
+      `Submitting with voice ID: ${submissionPayload.voice_id}, Voice Name: ${submissionPayload.voice_name}`
+    );
 
     try {
       await axios.post(
@@ -76,6 +100,7 @@ function CreateBot() {
       console.error("Error during creating bot:", error);
     }
   };
+
   return (
     <div>
       {" "}
@@ -170,9 +195,11 @@ function CreateBot() {
                 onChange={handleChange}
               >
                 <option value="">Select a Voice</option>
-                <option value="James">James</option>
-                <option value="Mary">Mary</option>
-                {/* Add more voice name options as needed */}
+                {voiceOptions.map((option) => (
+                  <option key={option.voice_id} value={option.voice_id}>
+                    {option.name}
+                  </option>
+                ))}
               </select>
             </label>
           )}
@@ -186,6 +213,6 @@ function CreateBot() {
       </form>
     </div>
   );
-}
+};
 
 export default CreateBot;

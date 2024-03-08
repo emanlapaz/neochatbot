@@ -41,6 +41,8 @@ class ChatbotDetails(BaseModel):
     specialization: str
     voice_enabled: bool = False
     voice_name: Optional[str] = None
+    voice_id: Optional[str] = None
+
 
 class TextToSpeechRequest(BaseModel):
     text: str
@@ -146,10 +148,11 @@ async def create_chatbot(chatbots: ChatbotDetails, user_id: str = Depends(get_cu
         new_chatbot_ref = db.reference(f'users/{user_id}/chatbots').push(chatbots_dict)
         
         chatbot_id = new_chatbot_ref.key
-
+        
         return {"status": "Customization saved", "chatbot_id": chatbot_id, "chatbots": chatbots_dict}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save chatbot: {str(e)}")
+
 
 @app.post("/load-chatbot/")
 async def load_chatbot(data: dict, user_id: str = Depends(get_current_user)):
