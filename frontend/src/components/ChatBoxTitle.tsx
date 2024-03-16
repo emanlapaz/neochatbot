@@ -59,7 +59,7 @@ function Title({ setMessages }: Props) {
           config
         );
         if (response.status === 200) {
-          setMessages([]); // Clear the messages upon successful reset
+          setMessages({ userMessages: [], assistantMessages: [] });
         } else {
           console.error("Error on API request backend reset");
         }
