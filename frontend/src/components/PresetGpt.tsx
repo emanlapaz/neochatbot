@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 
 interface ChatbotConfig {
-  id: string; // Ensure there's an ID or some unique identifier for each config
+  id: string;
   bot_name: string;
   language: string;
   personality: string;
@@ -25,7 +25,7 @@ const PresetGpt: React.FC = () => {
   const [interests, setInterests] = useState<string[]>([]);
   const [chatbotConfigs, setChatbotConfigs] = useState<ChatbotConfig[]>([]);
   const [openInterest, setOpenInterest] = useState<string | null>(null);
-  const [openBotDetail, setOpenBotDetail] = useState<string | null>(null); // State to track which chatbot's details are open
+  const [openBotDetail, setOpenBotDetail] = useState<string | null>(null);
 
   useEffect(() => {
     const auth: Auth = getAuth();
@@ -79,10 +79,10 @@ const PresetGpt: React.FC = () => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const userChatbotsRef = ref(database, `users/${user.uid}/chatbots`);
-        const newChatbotRef = push(userChatbotsRef); // This creates a new reference with a unique ID
+        const newChatbotRef = push(userChatbotsRef);
         set(newChatbotRef, {
           ...config,
-          id: newChatbotRef.key, // Use Firebase-generated unique key as the chatbot ID
+          id: newChatbotRef.key,
         })
           .then(() => {
             console.log(

@@ -118,7 +118,7 @@ const CreateBot: React.FC = () => {
   ]);
 
   const [userToken, setUserToken] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null); // State to hold the user ID
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     const auth = getAuth();
@@ -153,7 +153,7 @@ const CreateBot: React.FC = () => {
       ...chatbots,
       user_id: userId,
       voice_enabled: chatbots.voice_enabled === "Yes",
-      // Use the selected voice option to set voice_id and voice_name. If voice is not enabled, set them to null.
+
       voice_id:
         chatbots.voice_enabled === "Yes" ? selectedVoiceOption?.voice_id : null,
       voice_name:

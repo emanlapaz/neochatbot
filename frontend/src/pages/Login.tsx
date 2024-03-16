@@ -13,7 +13,6 @@ const LoginPage: React.FC = () => {
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
-      // Attempt to log in
       await signInWithEmailAndPassword(auth, email, password);
       console.log("Login successful");
       navigate("/main");
@@ -23,21 +22,19 @@ const LoginPage: React.FC = () => {
         errorMessage = error.message;
       }
       console.error("Login failed: ", errorMessage);
-      setErrorMessage(errorMessage); // Set error message state
+      setErrorMessage(errorMessage);
     }
   };
 
   const handleSignUp = () => {
-    navigate("/signup"); // Navigate to the signup page
+    navigate("/signup");
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="flex w-full max-w-6xl mx-auto">
-        {/* About Section */}
         <div className="flex-1 max-w-4xl p-5 text-center mr-8">
           {" "}
-          {/* Added right margin */}
           <h1 className="text-4xl font-bold text-white mb-4">
             NEO ChatBot Creator
           </h1>
@@ -60,28 +57,25 @@ const LoginPage: React.FC = () => {
           </p>
         </div>
 
-        {/* Login Form */}
         <div className="flex items-center justify-center">
           <div className="w-auto p-8 bg-white rounded-lg shadow-md">
             <h1 className="text-4xl font-bold mb-4">
               Login to NEO ChatBot Creator
             </h1>
-            {/* Display Error Message */}
+
             {errorMessage && (
               <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
             )}
             <form onSubmit={handleLogin} className="space-y-6">
-              {/* Email Input */}
               <div className="mb-4">
                 <input
-                  type="email" // Change type to email for semantic correctness
+                  type="email"
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  placeholder="Email" // Change placeholder to Email
+                  placeholder="Email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)} // Update function to setEmail
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
-              {/* Password Input */}
               <div className="mb-6">
                 <input
                   type="password"
@@ -91,7 +85,6 @@ const LoginPage: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-              {/* Submit Button */}
               <button
                 type="submit"
                 className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
@@ -99,7 +92,6 @@ const LoginPage: React.FC = () => {
                 Log In
               </button>
             </form>
-            {/* Sign Up Link */}
             <p className="mt-4 text-gray-600">
               Don't have an account?{" "}
               <span

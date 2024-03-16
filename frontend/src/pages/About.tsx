@@ -18,7 +18,7 @@ export const About: React.FC = (): JSX.Element => {
         </p>
 
         <p className="mb-4 text-white">
-          Our mission is to democratize AI technology, making it accessible for
+          Our mission is to simplify AI technology, making it accessible for
           businesses and individuals to create intelligent conversational agents
           without the need for extensive programming knowledge.
         </p>
@@ -30,7 +30,6 @@ export const About: React.FC = (): JSX.Element => {
           intuitive and powerful platform for our users.
         </p>
 
-        {/* Optional Team Photo or Graphic */}
         <img
           className="mt-1 mx-auto object-cover rounded-lg shadow-md"
           src="neo_icon.png"

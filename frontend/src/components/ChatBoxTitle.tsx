@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { useChatbot } from "./ChatbotContext"; // Import the useChatbot hook
+import { useChatbot } from "./ChatbotContext";
 
 type Props = {
   setMessages: any;
@@ -9,8 +9,8 @@ type Props = {
 
 function Title({ setMessages }: Props) {
   const [isResetting, setIsResetting] = useState(false);
-  const [botName, setBotName] = useState("Loading bot..."); // Default text while loading
-  const { chatbotId } = useChatbot(); // Retrieve chatbotId from ChatbotContext
+  const [botName, setBotName] = useState("Loading bot...");
+  const { chatbotId } = useChatbot();
 
   useEffect(() => {
     const auth = getAuth();
@@ -21,24 +21,22 @@ function Title({ setMessages }: Props) {
             headers: { Authorization: `Bearer ${idToken}` },
           };
 
-          // Fetch bot name using chatbotId
           axios
             .get(`http://localhost:8000/get-bot-name/${chatbotId}`, config)
             .then((res) => {
               if (res.status === 200 && res.data.bot_name) {
-                setBotName(res.data.bot_name); // Set the bot name from response
+                setBotName(res.data.bot_name);
               }
             })
             .catch((err) => {
               console.error(err.message);
-              setBotName("Bot name load error"); // Error fallback
+              setBotName("Bot name load error");
             });
         });
       }
     });
-  }, [chatbotId]); // Watch for changes in chatbotId
+  }, [chatbotId]);
 
-  //Reset the conversation
   const resetConversation = async () => {
     setIsResetting(true);
 
@@ -46,14 +44,12 @@ function Title({ setMessages }: Props) {
     const user = auth.currentUser;
 
     if (user && chatbotId) {
-      // Ensure chatbotId is not null or undefined
       try {
         const idToken = await user.getIdToken();
         const config = {
           headers: { Authorization: `Bearer ${idToken}` },
         };
 
-        // Append the chatbotId as a query parameter
         const response = await axios.get(
           `http://localhost:8000/reset?chatbot_id=${chatbotId}`,
           config
@@ -64,8 +60,7 @@ function Title({ setMessages }: Props) {
           console.error("Error on API request backend reset");
         }
       } catch (error: any) {
-        // Handle any errors
-        console.error(error.response?.data?.detail || error.message); // Improved error logging
+        console.error(error.response?.data?.detail || error.message);
       }
     } else {
       console.error("No user is signed in or chatbotId is missing.");
@@ -74,12 +69,11 @@ function Title({ setMessages }: Props) {
     setIsResetting(false);
   };
 
-  // Add reset button on title
   return (
     <div className="flex justify-between items-center w-full p-2 bg-blue-900 text-white font-bold drop-shadow">
       <div className="font-bold">{botName}</div>
       <button
-        onClick={resetConversation} //changes color when mouse hovered icon from heroicons
+        onClick={resetConversation}
         className={
           "transition-all duration-300 text-blue-300 hover:text-yellow-300 " +
           (isResetting && "animate-pulse")

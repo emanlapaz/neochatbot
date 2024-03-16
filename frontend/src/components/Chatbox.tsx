@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Title from "./ChatBoxTitle";
-import RecordChat from "./RecordChat"; // Make sure you have this component set up for recording
+import RecordChat from "./RecordChat";
 import { getAuth } from "firebase/auth";
 import { getDatabase, ref, onValue, push } from "firebase/database";
 import { useChatbot } from "./ChatbotContext";
@@ -87,7 +87,7 @@ function Chatbox() {
         const token = await user.getIdToken();
         const response = await axios.post(
           "http://localhost:8000/post-text/",
-          { text: message, chatbotId }, // Use the message parameter here
+          { text: message, chatbotId },
           {
             headers: {
               "Content-Type": "application/json",
@@ -104,7 +104,6 @@ function Chatbox() {
           };
           await push(chatRef, botMessage);
 
-          // Convert bot's response to speech and stream the audio
           const audioResponse = await fetch(
             "http://localhost:8000/convert-text-to-speech/",
             {
@@ -115,7 +114,7 @@ function Chatbox() {
               },
               body: JSON.stringify({
                 text: response.data.bot_response,
-                voice_id: voiceId, // Pass voiceId here
+                voice_id: voiceId,
               }),
             }
           );
@@ -124,7 +123,6 @@ function Chatbox() {
             throw new Error("Failed to convert text to speech.");
           }
 
-          // Play the streamed audio response
           const audioBlob = await audioResponse.blob();
           const audioUrl = URL.createObjectURL(audioBlob);
           const audio = new Audio(audioUrl);
@@ -134,7 +132,7 @@ function Chatbox() {
     } catch (error) {
       console.error("Failed to send message or convert text to speech:", error);
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false);
     }
   };
 
@@ -155,7 +153,7 @@ function Chatbox() {
 
       if (messageDecoded) {
         console.log(messageDecoded);
-        // Assuming voiceId is available in the scope
+
         sendMessage(messageDecoded, voiceId);
       } else {
         console.log("No decoded message received from the backend.");
@@ -171,7 +169,6 @@ function Chatbox() {
     <div className="h-screen overflow-y-hidden bg-black">
       <Title setMessages={setMessages} />
       <div className="flex flex-col h-5/6 overflow-y-scroll p-4 gap-2">
-        {/* Messages display */}
         {[...messages.userMessages, ...messages.assistantMessages]
           .sort((a, b) => {
             const dateA = a.timestamp ? new Date(a.timestamp) : null;
@@ -219,7 +216,7 @@ function Chatbox() {
           onKeyPress={(e) => e.key === "Enter" && sendMessage(message, voiceId)}
         />
         <button
-          onClick={() => sendMessage(message, voiceId)} // Adjusted here
+          onClick={() => sendMessage(message, voiceId)}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Send

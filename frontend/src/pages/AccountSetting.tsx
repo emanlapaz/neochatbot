@@ -16,7 +16,7 @@ interface UserState {
   first_name: string;
   last_name: string;
   password: string;
-  emailVerified: boolean; // Add emailVerified property
+  emailVerified: boolean;
 }
 
 const AccountSetting: React.FC = () => {
@@ -30,13 +30,12 @@ const AccountSetting: React.FC = () => {
     first_name: "",
     last_name: "",
     password: "",
-    emailVerified: false, // Initialize emailVerified to false
+    emailVerified: false,
   });
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        // Fetch user details from database
         const userRef = ref(database, `users/${user.uid}`);
         onValue(userRef, (snapshot) => {
           const data = snapshot.val();
@@ -47,7 +46,7 @@ const AccountSetting: React.FC = () => {
               email: user.email || "",
               first_name: data.first_name || "",
               last_name: data.last_name || "",
-              emailVerified: user.emailVerified || false, // Set emailVerified based on user.emailVerified
+              emailVerified: user.emailVerified || false,
             }));
           }
         });
@@ -73,29 +72,23 @@ const AccountSetting: React.FC = () => {
 
     if (user) {
       try {
-        // Update user details in database
         await update(ref(database, `users/${user.uid}`), {
           username: userDetails.username,
           first_name: userDetails.first_name,
           last_name: userDetails.last_name,
         });
 
-        // Update email in Firebase Auth if it has been changed
         if (user.email !== userDetails.email) {
-          // Check if the new email address has been verified
           if (!userDetails.emailVerified) {
-            // If the new email address hasn't been verified, send a verification email
             await sendEmailVerification(user);
             alert(
               "A verification email has been sent to your new email address. Please verify your email before proceeding."
             );
           } else {
-            // If the new email address has been verified, update the email address in Firebase Auth
             await updateEmail(user, userDetails.email);
           }
         }
 
-        // Update password in Firebase Auth if a new password has been provided
         if (userDetails.password) {
           await updatePassword(user, userDetails.password);
         }
@@ -145,8 +138,6 @@ const AccountSetting: React.FC = () => {
               <h3 className="block text-gray-700 text-lg font-bold mb-4">
                 Update User Details
               </h3>
-              {/* Form fields for updating user details */}
-              {/* Username */}
               <div className="mb-4">
                 <label
                   htmlFor="username"
@@ -163,7 +154,6 @@ const AccountSetting: React.FC = () => {
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
               </div>
-              {/* First Name */}
               <div className="mb-4">
                 <label
                   htmlFor="first_name"
@@ -180,7 +170,6 @@ const AccountSetting: React.FC = () => {
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
               </div>
-              {/* Last Name */}
               <div className="mb-4">
                 <label
                   htmlFor="last_name"
@@ -214,7 +203,6 @@ const AccountSetting: React.FC = () => {
                   className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
               </div>
-              {/* Submit Button */}
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                 type="submit"
