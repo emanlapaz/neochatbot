@@ -28,8 +28,6 @@ function Chatbox() {
     if (user && chatbotId) {
       const userId = user.uid;
       const db = getDatabase();
-
-      // Fetch chat history
       const chatHistoryRef = ref(
         db,
         `users/${userId}/chatbots/${chatbotId}/chats`
@@ -54,16 +52,15 @@ function Chatbox() {
         setMessages({ userMessages, assistantMessages });
       });
 
-      // Fetch chatbot data including voice_id
       const chatbotRef = ref(db, `users/${userId}/chatbots/${chatbotId}`);
       onValue(chatbotRef, (snapshot) => {
         const chatbotData = snapshot.val();
         if (chatbotData) {
           const voiceId = chatbotData.voice_id;
-          console.log("Voice ID:", voiceId);
+          console.log("Voice ID: ", voiceId);
           setVoiceId(voiceId);
         } else {
-          console.log("Chatbot data not found.");
+          console.log("No Chatbot data");
         }
       });
     }

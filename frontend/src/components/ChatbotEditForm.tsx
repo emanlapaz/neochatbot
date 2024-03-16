@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 
-// VoiceOption interface to describe each voice option
 interface VoiceOption {
   voice_id: string;
   name: string;
@@ -14,7 +13,6 @@ interface VoiceOption {
   };
 }
 
-// Chatbot interface updated to optionally include voice_id
 interface Chatbot {
   id: string;
   bot_name: string;
@@ -27,7 +25,6 @@ interface Chatbot {
   voice_id?: string;
 }
 
-// ChatbotEditFormProps interface for props expected by the ChatbotEditForm component
 interface ChatbotEditFormProps {
   chatbot: Chatbot;
   onSave: (chatbot: Chatbot) => void;
@@ -39,7 +36,6 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
   onSave,
   onCancel,
 }) => {
-  // State hooks for form fields
   const [scene, setScene] = useState(chatbot.scene);
   const [personality, setPersonality] = useState(chatbot.personality);
   const [language, setLanguage] = useState(chatbot.language);
@@ -49,7 +45,6 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
   );
   const [voiceId, setVoiceId] = useState(chatbot.voice_id);
 
-  // State for voice options
   const [voiceOptions] = useState<VoiceOption[]>([
     {
       voice_id: "EXAVITQu4vr4xnSDxMaL",
@@ -133,7 +128,6 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
     },
   ]);
 
-  // Handle change in form fields
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
@@ -156,12 +150,10 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
         case "specialization":
           setSpecialization(value);
           break;
-        // Additional cases as needed
       }
     }
   };
 
-  // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave({
@@ -182,7 +174,6 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
         Configuring {chatbot.bot_name}{" "}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4 p-4">
-        {/* Scene Input */}
         <div>
           <label
             htmlFor="scene"
@@ -200,7 +191,6 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
           />
         </div>
 
-        {/* Personality Select */}
         <label>
           Personality:
           <select
@@ -218,7 +208,6 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
           </select>
         </label>
 
-        {/* Language Select */}
         <label>
           Language:
           <select
@@ -236,7 +225,6 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
           </select>
         </label>
 
-        {/* Specialization Input */}
         <label>
           Specialization:
           <input
@@ -248,7 +236,6 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
           />
         </label>
 
-        {/* Voice Enabled Select */}
         <label>
           Enable Voice:
           <select
@@ -262,7 +249,6 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
           </select>
         </label>
 
-        {/* Conditional Voice Name Select */}
         {voiceEnabled && (
           <label>
             Voice Name:

@@ -19,8 +19,8 @@ interface Chatbot {
   language: string;
   specialization: string;
   voice_enabled: boolean;
-  voice_id?: string; // Add this line to include the voice_id property
-  voice_name?: string; // Optional: include the voice_name property, mark as optional if it might not be present
+  voice_id?: string;
+  voice_name?: string;
 }
 
 function ChatBotList() {
@@ -98,7 +98,7 @@ function ChatBotList() {
   };
 
   const loadChatbotDetails = async (chatbotId: string, voiceId: string) => {
-    setChatbotId(chatbotId); // Context setting for chatbot details loading
+    setChatbotId(chatbotId);
     try {
       const auth = getAuth();
       if (!auth.currentUser) {
@@ -113,7 +113,7 @@ function ChatBotList() {
         },
         body: JSON.stringify({
           chatbot_id: chatbotId,
-          voice_id: voiceId, // Now includes the voice_id
+          voice_id: voiceId,
         }),
       });
       if (!response.ok) {
