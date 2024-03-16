@@ -7,8 +7,7 @@ from typing import List, Optional
 from fastapi.responses import JSONResponse, StreamingResponse
 import requests
 
-
-# Custom Function Imports
+#Function Imports
 from functions.firebase_database import save_chat, reset_chat_history
 from functions.openai_requests import get_chat_response, convert_audio_to_text
 from functions.firebase_authorization import get_current_user
@@ -22,7 +21,7 @@ firebase_admin.initialize_app(cred, {
 
 class TextMessage(BaseModel):
     text: str
-    chatbotId: str  # Add the chatbotId field
+    chatbotId: str
 
 class UserSignupModel(BaseModel):
     username: str
@@ -30,7 +29,7 @@ class UserSignupModel(BaseModel):
     password: str
     first_name: str
     last_name: str
-    interests: List[str] = []  # List of interests
+    interests: List[str] = []
 
 class ChatbotDetails(BaseModel):
     user_id: str
@@ -48,10 +47,9 @@ class TextToSpeechRequest(BaseModel):
     text: str
     voice_id: Optional[str] = None
 
-# Initiate app
 app = FastAPI()
 
-# CORS Origins
+# CORS
 origins = [
     "http://localhost:5173",
     "http://localhost:5174",
@@ -59,7 +57,6 @@ origins = [
     "http://localhost:3000",
 ]
 
-# CORS Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -73,17 +70,14 @@ app.add_middleware(
 async def check_health():
     return {"message": "NeoChatBot! is Healthy"}
 
-# Reset messages
-
+#Reset messages
 @app.get("/reset")
 async def reset_conversation(user_id: str = Depends(get_current_user), chatbot_id: str = Query(None)):
-    # Check if chatbot_id is provided
+
     if chatbot_id is None:
-        # If no chatbot_id is provided, you might want to reset all chats for the user
-        # or handle the request differently based on your application's requirements.
         raise HTTPException(status_code=400, detail="Chatbot ID is required for resetting chat history.")
     else:
-        # Reset chat history for the specified chatbot
+        # Reset chat for the specified chatbot
         reset_chat_history(user_id, chatbot_id)
         return {"message": f"Chat history for chatbot {chatbot_id} has been reset."}
 
@@ -103,7 +97,7 @@ async def get_bot_name(chatbot_id: str, user_id: str = Depends(get_current_user)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve bot name: {str(e)}")
 
-# Post text and get response
+#Post text and get response
 @app.post("/post-text/")
 async def post_text(message: TextMessage, user_id: str = Depends(get_current_user)):
     text = message.text
@@ -119,7 +113,7 @@ async def post_text(message: TextMessage, user_id: str = Depends(get_current_use
 
 
 
-# User Signup
+#User Signup
 @app.post("/signup/")
 async def signup(user_details: UserSignupModel):
     try:
@@ -167,7 +161,6 @@ async def load_chatbot(data: dict, user_id: str = Depends(get_current_user)):
         if not chatbot_details:
             raise HTTPException(status_code=404, detail="Chatbot not found")
 
-        # Optionally, check for voice_id in chatbot details for debugging or logging
         if "voice_id" in chatbot_details:
             print(f"Voice ID: {chatbot_details['voice_id']} found for chatbot: {chatbot_id}")
         else:
@@ -176,30 +169,25 @@ async def load_chatbot(data: dict, user_id: str = Depends(get_current_user)):
         return chatbot_details
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to load chatbot: {str(e)}")
-
     
 @app.delete("/delete-chatbot/{chatbot_id}")
 async def delete_chatbot(chatbot_id: str, user_id: str = Depends(get_current_user)):
     try:
-        # Reference to the user's chatbot
         chatbot_ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}')
-        
-        # Check if the chatbot exists before attempting to delete
+
         if not chatbot_ref.get():
             return JSONResponse(status_code=404, content={"message": "Chatbot not found"})
         
-        # Delete the chatbot
         chatbot_ref.delete()
         
         return {"message": f"Chatbot {chatbot_id} successfully deleted."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete chatbot: {str(e)}")
 
+#Convert audio to text
 @app.post("/post-audio/")
 async def post_audio(file: UploadFile = File(...)):
 
-    # Convert audio to text - production
-    # Save the file temporarily
     with open(file.filename, "wb") as buffer:
         buffer.write(file.file.read())
     audio_input = open(file.filename, "rb")
@@ -209,7 +197,6 @@ async def post_audio(file: UploadFile = File(...)):
 
     print(message_decoded)
 
-    # Guard: Ensure output
     if not message_decoded:
         raise HTTPException(status_code=400, detail="Failed to decode audio")
     
@@ -226,5 +213,4 @@ async def text_to_speech_endpoint(request: TextToSpeechRequest):
     def iterfile():
         yield audio_output
 
-    # Return output audio as a streaming response
     return StreamingResponse(iterfile(), media_type="application/octet-stream")
