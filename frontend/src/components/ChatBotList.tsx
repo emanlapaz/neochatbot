@@ -105,17 +105,20 @@ function ChatBotList() {
         throw new Error("No user is currently signed in.");
       }
       const userToken = await auth.currentUser.getIdToken(true);
-      const response = await fetch("http://localhost:8000/load-chatbot/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
-        },
-        body: JSON.stringify({
-          chatbot_id: chatbotId,
-          voice_id: voiceId,
-        }),
-      });
+      const response = await fetch(
+        "https://neochatbot-2.onrender.com//load-chatbot/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userToken}`,
+          },
+          body: JSON.stringify({
+            chatbot_id: chatbotId,
+            voice_id: voiceId,
+          }),
+        }
+      );
       if (!response.ok) {
         throw new Error("Failed to load chatbot details");
       }
@@ -134,7 +137,7 @@ function ChatBotList() {
       }
       const userToken = await auth.currentUser.getIdToken(true);
       const response = await fetch(
-        `http://localhost:8000/delete-chatbot/${chatbotId}`,
+        `https://neochatbot-2.onrender.com/delete-chatbot/${chatbotId}`,
         {
           method: "DELETE",
           headers: {

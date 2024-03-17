@@ -86,7 +86,7 @@ function Chatbox() {
 
         const token = await user.getIdToken();
         const response = await axios.post(
-          "http://localhost:8000/post-text/",
+          "https://neochatbot-2.onrender.com/post-text/",
           { text: message, chatbotId },
           {
             headers: {
@@ -105,7 +105,7 @@ function Chatbox() {
           await push(chatRef, botMessage);
 
           const audioResponse = await fetch(
-            "http://localhost:8000/convert-text-to-speech/",
+            "https://neochatbot-2.onrender.com//convert-text-to-speech/",
             {
               method: "POST",
               headers: {
@@ -146,7 +146,7 @@ function Chatbox() {
       formData.append("file", blob, "myFile.wav");
 
       const axiosResponse = await axios.post(
-        "http://localhost:8000/post-audio",
+        "https://neochatbot-2.onrender.com/post-audio",
         formData
       );
       const messageDecoded = axiosResponse.data.message;

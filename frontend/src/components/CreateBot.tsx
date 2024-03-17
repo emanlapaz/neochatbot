@@ -165,7 +165,7 @@ const CreateBot: React.FC = () => {
 
     try {
       await axios.post(
-        "http://localhost:8000/create-chatbot/",
+        "https://neochatbot-2.onrender.com/create-chatbot/",
         submissionPayload,
         {
           headers: {
