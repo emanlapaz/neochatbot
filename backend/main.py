@@ -6,8 +6,13 @@ from firebase_admin import credentials, auth, db
 from typing import List, Optional
 from fastapi.responses import JSONResponse, StreamingResponse
 import requests
+from pathlib import Path
+import sys
 
-#Function Imports
+project_root = Path(__file__).parent
+functions_path = project_root / 'functions'
+sys.path.append(str(functions_path))
+
 from functions.firebase_database import save_chat, reset_chat_history
 from functions.openai_requests import get_chat_response, convert_audio_to_text
 from functions.firebase_authorization import get_current_user
