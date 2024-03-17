@@ -8,6 +8,8 @@ from fastapi.responses import JSONResponse, StreamingResponse
 import requests
 from pathlib import Path
 import sys
+import os
+import json
 
 project_root = Path(__file__).parent
 functions_path = project_root / 'functions'
@@ -18,7 +20,13 @@ from functions.openai_requests import get_chat_response, convert_audio_to_text
 from functions.firebase_authorization import get_current_user
 from functions.text_to_speech import convert_text_to_speech
 
-cred = credentials.Certificate("C:\\Users\\eugen\\neochatbot\\backend\\neo-chatbot-e6c8c-firebase-adminsdk-mnv0s-cccccdc3f9.json")
+from dotenv import load_dotenv
+load_dotenv()  # This loads the environment variables from .env
+
+firebase_credentials_raw = os.getenv("FIREBASE_CREDENTIALS")
+firebase_credentials = json.loads(firebase_credentials_raw)
+
+cred = credentials.Certificate(firebase_credentials)
 firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://neo-chatbot-e6c8c-default-rtdb.europe-west1.firebasedatabase.app/'
 })
