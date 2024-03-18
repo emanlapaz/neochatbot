@@ -10,3 +10,4 @@ frontend/firebaseConfig.js
 frontend/firebaseConfig.ts
 backend/myFile.wav
 frontend/.env.production
+frontend/.env
