@@ -106,7 +106,7 @@ function ChatBotList() {
       }
       const userToken = await auth.currentUser.getIdToken(true);
       const response = await fetch(
-        "https://neochatbot-2.onrender.com//load-chatbot/",
+        "https://neochatbot-2.onrender.com/load-chatbot/",
         {
           method: "POST",
           headers: {

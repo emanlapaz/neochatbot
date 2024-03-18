@@ -105,7 +105,7 @@ function Chatbox() {
           await push(chatRef, botMessage);
 
           const audioResponse = await fetch(
-            "https://neochatbot-2.onrender.com//convert-text-to-speech/",
+            "https://neochatbot-2.onrender.com/convert-text-to-speech/",
             {
               method: "POST",
               headers: {
