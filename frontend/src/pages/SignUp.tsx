@@ -51,20 +51,24 @@ const SignUp: React.FC = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8000/signup/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-          first_name,
-          last_name,
-          interests: selectedInterests,
-        }),
-      });
+      const response = await fetch(
+        "https://neochatbot-2.onrender.com/signup/",
+        //"http://localhost:8000/signup/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+            first_name,
+            last_name,
+            interests: selectedInterests,
+          }),
+        }
+      );
 
       if (response.ok) {
         console.log("Signup successful");

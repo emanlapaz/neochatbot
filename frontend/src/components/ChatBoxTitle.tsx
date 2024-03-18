@@ -25,6 +25,7 @@ function Title({ setMessages }: Props) {
             .get(
               `https://neochatbot-2.onrender.com/get-bot-name/${chatbotId}`,
               config
+              //`http://localhost:8000/get-bot-name/${chatbotId}`,config
             )
             .then((res) => {
               if (res.status === 200 && res.data.bot_name) {
@@ -56,6 +57,7 @@ function Title({ setMessages }: Props) {
         const response = await axios.get(
           `https://neochatbot-2.onrender.com/reset?chatbot_id=${chatbotId}`,
           config
+          //`http://localhost:8000/reset?chatbot_id=${chatbotId}`,config
         );
         if (response.status === 200) {
           setMessages({ userMessages: [], assistantMessages: [] });

@@ -156,18 +156,32 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSave({
+
+    const updatedChatbot = {
       ...chatbot,
       scene,
       personality,
       language,
       specialization,
       voice_enabled: voiceEnabled,
-      voice_name: voiceOptions.find((option) => option.voice_id === voiceId)
-        ?.name,
-      voice_id: voiceEnabled ? voiceId : undefined,
-    });
+    };
+
+    if (voiceEnabled) {
+      const voiceOption = voiceOptions.find(
+        (option) => option.voice_id === voiceId
+      );
+      updatedChatbot.voice_id = voiceId;
+      updatedChatbot.voice_name = voiceOption
+        ? voiceOption.name
+        : "voiceDisabled";
+    } else {
+      updatedChatbot.voice_id = "voiceDisabled";
+      updatedChatbot.voice_name = "voiceDisabled";
+    }
+
+    onSave(updatedChatbot);
   };
+
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">

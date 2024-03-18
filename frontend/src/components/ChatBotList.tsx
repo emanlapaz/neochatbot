@@ -69,22 +69,27 @@ function ChatBotList() {
 
   useEffect(() => {
     const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      const db = getDatabase();
-      const chatbotsRef = ref(db, `users/${user.uid}/chatbots`);
-      onValue(chatbotsRef, (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const loadedChatbots = Object.keys(data).map((key) => ({
-            id: key,
-            ...data[key],
-          }));
-          setChatbots(loadedChatbots);
-        }
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        const db = getDatabase();
+        const chatbotsRef = ref(db, `users/${user.uid}/chatbots`);
+        onValue(chatbotsRef, (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            const loadedChatbots = Object.keys(data).map((key) => ({
+              id: key,
+              ...data[key],
+            }));
+            setChatbots(loadedChatbots);
+          }
+          setLoading(false);
+        });
+      } else {
         setLoading(false);
-      });
-    }
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const togglePlaceholder = (id: string) => {
@@ -107,6 +112,7 @@ function ChatBotList() {
       const userToken = await auth.currentUser.getIdToken(true);
       const response = await fetch(
         "https://neochatbot-2.onrender.com/load-chatbot/",
+        //"http://localhost:8000/load-chatbot/",
         {
           method: "POST",
           headers: {
@@ -137,7 +143,8 @@ function ChatBotList() {
       }
       const userToken = await auth.currentUser.getIdToken(true);
       const response = await fetch(
-        `https://neochatbot-2.onrender.com/delete-chatbot/${chatbotId}`,
+        //`https://neochatbot-2.onrender.com/delete-chatbot/${chatbotId}`,
+        `http://localhost:8000/delete-chatbot/${chatbotId}`,
         {
           method: "DELETE",
           headers: {
