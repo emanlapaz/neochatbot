@@ -67,7 +67,7 @@ origins = [
     "http://localhost:5174",
     "http://localhost:4173",
     "http://localhost:3000",
-    "https://neochatbot.onrender.com",  # Add this line
+    "https://neochatbot.onrender.com", 
 ]
 
 app.add_middleware(
