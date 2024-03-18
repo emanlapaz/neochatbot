@@ -2,7 +2,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Main from "./pages/Main";
-import LoginPage from "./pages/LogIn";
+import LoginPage from "./pages/Login"; //log in on github
 import About from "./pages/About";
 import AccountSetting from "./pages/AccountSetting";
 import SignUp from "./pages/SignUp";
