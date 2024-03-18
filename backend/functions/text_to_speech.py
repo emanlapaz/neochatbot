@@ -1,10 +1,15 @@
 import requests
 from decouple import config
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 ELEVEN_LABS_API_KEY = config("ELEVEN_LABS_API_KEY")
 
 def convert_text_to_speech(message: str, voice_id: str):
-    print(f"Using voice_id: {voice_id}")
+    logging.debug(f"Using voice_id: {voice_id}")
+    logging.debug(f"Message: {message}")
 
     body = {
         "text": message,
@@ -23,14 +28,16 @@ def convert_text_to_speech(message: str, voice_id: str):
 
     try:
         response = requests.post(endpoint, json=body, headers=headers)
+        logging.debug(f"Request URL: {response.url}")
+        logging.debug(f"Request Headers: {response.request.headers}")
+        logging.debug(f"Request Body: {response.request.body}")
 
         if response.status_code == 200:
             return response.content
         else:
-            print(f"Failed to convert text to speech with status code: {response.status_code}")
-            if response.status_code != 200:
-                print(f"Response body: {response.text}")
+            logging.error(f"Failed to convert text to speech with status code: {response.status_code}")
+            logging.debug(f"Response: {response.text}")
             return None
     except Exception as e:
-        print(f"Exception occurred: {e}")
+        logging.exception("Exception occurred during text-to-speech conversion")
         return None
