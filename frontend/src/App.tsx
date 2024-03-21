@@ -1,14 +1,13 @@
-// App.tsx
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Main from "./pages/Main";
-import LoginPage from "./pages/Login"; //for deployment
-//import LoginPage from "./pages/LogIn"; //for dev
+import LoginPage from "./pages/Login";
 import About from "./pages/About";
 import AccountSetting from "./pages/AccountSetting";
 import SignUp from "./pages/SignUp";
 
 const App: React.FC = () => {
+  console.log("Setting up routes...");
   return (
     <BrowserRouter>
       <Routes>
