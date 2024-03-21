@@ -52,8 +52,8 @@ const SignUp: React.FC = () => {
 
     try {
       const response = await fetch(
-        //"https://neochatbot-2.onrender.com/signup/",
-        "http://localhost:8000/signup/",
+        "https://neochatbot-2.onrender.com/signup/",
+        //"http://localhost:8000/signup/",
         {
           method: "POST",
           headers: {
