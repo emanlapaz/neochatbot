@@ -50,11 +50,6 @@ const LoginPage: React.FC = () => {
             and deploy chatbots tailored for various applications, from customer
             service to interactive engagements.
           </p>
-          <p className="mb-4 text-white">
-            Our mission is to democratize AI technology, making it accessible
-            for businesses and individuals to create intelligent conversational
-            agents without the need for extensive programming knowledge.
-          </p>
         </div>
 
         <div className="flex items-center justify-center">
