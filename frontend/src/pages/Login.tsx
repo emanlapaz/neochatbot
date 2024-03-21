@@ -46,9 +46,9 @@ const LoginPage: React.FC = () => {
           />
           <p className="mb-4 text-white">
             NEO ChatBot is a web-based AI chatbot creation platform designed for
-            ease of use and flexibility. It enables users to build, fine-tune,
-            and deploy chatbots tailored for various applications, from customer
-            service to interactive engagements.
+            ease of use and flexibility. It enables users to create and
+            customize chatbots for various applications using interactive text
+            and voice conversations.
           </p>
         </div>
 
