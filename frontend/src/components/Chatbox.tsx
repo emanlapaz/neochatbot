@@ -13,15 +13,17 @@ interface Message {
 }
 
 function Chatbox() {
-  const [message, setMessage] = useState("");
+  //state variables
+  const [message, setMessage] = useState(""); //state for user input message
   const [messages, setMessages] = useState<{
     userMessages: Message[];
     assistantMessages: Message[];
-  }>({ userMessages: [], assistantMessages: [] });
-  const [isLoading, setIsLoading] = useState(false);
-  const { chatbotId } = useChatbot();
-  const [voiceId, setVoiceId] = useState<string | null>(null);
+  }>({ userMessages: [], assistantMessages: [] }); //state for user and assistant message
+  const [isLoading, setIsLoading] = useState(false); //state to track loading status
+  const { chatbotId } = useChatbot(); //gets the chatbotId from context
+  const [voiceId, setVoiceId] = useState<string | null>(null); //sate for the voice id
 
+  //fetch the chat hsitory and voiceId from firebase
   useEffect(() => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -66,6 +68,7 @@ function Chatbox() {
     }
   }, [chatbotId]);
 
+  //sends a message to the backend and update messages state, converts text to speech where applicable
   const sendMessage = async (message: string, voiceId: string | null) => {
     if (!message.trim()) return;
     setIsLoading(true);
@@ -137,6 +140,7 @@ function Chatbox() {
     }
   };
 
+  //handles audio recording stiop event
   const handleAudioStop = async (blobUrl: string) => {
     setIsLoading(true);
 

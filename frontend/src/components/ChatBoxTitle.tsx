@@ -8,10 +8,12 @@ type Props = {
 };
 
 function Title({ setMessages }: Props) {
+  //state variables
   const [isResetting, setIsResetting] = useState(false);
   const [botName, setBotName] = useState("Loading bot...");
   const { chatbotId } = useChatbot();
 
+  //fetch bot name and update state, firebase auth
   useEffect(() => {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
@@ -41,6 +43,7 @@ function Title({ setMessages }: Props) {
     });
   }, [chatbotId]);
 
+  //resets the conversation if the reset button is pressed
   const resetConversation = async () => {
     setIsResetting(true);
 

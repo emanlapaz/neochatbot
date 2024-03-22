@@ -56,6 +56,7 @@ const AccountSetting: React.FC = () => {
     });
   }, [auth, database, navigate]);
 
+  //handles input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     console.log("Name:", name);
@@ -66,29 +67,34 @@ const AccountSetting: React.FC = () => {
     }));
   };
 
+  //handles from submission
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     const user = auth.currentUser;
 
     if (user) {
       try {
+        //update user details in the database
         await update(ref(database, `users/${user.uid}`), {
           username: userDetails.username,
           first_name: userDetails.first_name,
           last_name: userDetails.last_name,
         });
 
+        //checks if email is updated
         if (user.email !== userDetails.email) {
           if (!userDetails.emailVerified) {
             await sendEmailVerification(user);
             alert(
-              "A verification email has been sent to your new email address. Please verify your email before proceeding."
+              "Verification email sent to your new email address. Please verify before proceeding."
             );
           } else {
+            //update email if email is verified
             await updateEmail(user, userDetails.email);
           }
         }
 
+        //checks if password is being updated
         if (userDetails.password) {
           await updatePassword(user, userDetails.password);
         }

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSave } from "@fortawesome/free-solid-svg-icons";
 
+//defines types and interfaces
 interface VoiceOption {
   voice_id: string;
   name: string;
@@ -25,6 +26,7 @@ interface Chatbot {
   voice_id?: string;
 }
 
+//define props
 interface ChatbotEditFormProps {
   chatbot: Chatbot;
   onSave: (chatbot: Chatbot) => void;
@@ -36,6 +38,7 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
   onSave,
   onCancel,
 }) => {
+  //defines state variables using useState hook
   const [scene, setScene] = useState(chatbot.scene);
   const [personality, setPersonality] = useState(chatbot.personality);
   const [language, setLanguage] = useState(chatbot.language);
@@ -45,6 +48,7 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
   );
   const [voiceId, setVoiceId] = useState(chatbot.voice_id);
 
+  //voice options array
   const [voiceOptions] = useState<VoiceOption[]>([
     {
       voice_id: "EXAVITQu4vr4xnSDxMaL",
@@ -128,15 +132,20 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
     },
   ]);
 
+  //handles input changes
   const handleChange = (
     e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>
   ) => {
     const { name, value, type } = e.target;
+
+    //Toggle voiceEnabled state
     if (name === "voice_enabled") {
       setVoiceEnabled(!voiceEnabled);
     } else if (name === "voice_id") {
+      //set voice id state
       setVoiceId(value);
     } else {
+      //sets appropriate state based on input name
       switch (name) {
         case "scene":
           setScene(value);
@@ -154,9 +163,11 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
     }
   };
 
+  //handles form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    //creates an updated chatbot with new values
     const updatedChatbot = {
       ...chatbot,
       scene,
@@ -166,6 +177,7 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
       voice_enabled: voiceEnabled,
     };
 
+    //update voice properties to toggle voice functionality on/off
     if (voiceEnabled) {
       const voiceOption = voiceOptions.find(
         (option) => option.voice_id === voiceId
@@ -179,6 +191,7 @@ const ChatbotEditForm: React.FC<ChatbotEditFormProps> = ({
       updatedChatbot.voice_name = "voiceDisabled";
     }
 
+    //save chatbot
     onSave(updatedChatbot);
   };
 

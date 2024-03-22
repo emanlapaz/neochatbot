@@ -2,7 +2,7 @@ import random
 from firebase_admin import db
 
 def fetch_latest_chat(user_id, chatbot_id):
-    # Default values for prompt instructions
+    #default chat bot settings
     defaults = {
         "bot_name": "Neo",
         "scene": "You are a customizable chatbot",
@@ -11,27 +11,24 @@ def fetch_latest_chat(user_id, chatbot_id):
         "specialization": "General Knowledge"
     }
 
-    # Fetch chatbot details from Firebase for the specific chatbot
+    #reference to the chatbots data in firebase
     chatbot_ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}')
+
+    #fetch the chatbot details from firebase
     chatbots = chatbot_ref.get()
 
-    # If there are customizations, override the default values
+    #if chatbot exists, updates the defaults with the actual settings
     if chatbots:
         for key in defaults.keys():
             if key in chatbots:
                 defaults[key] = chatbots[key]
 
-    # Determine the tone of the response based on a random element
+    #default tone, added a 50% chance that the response will include humour
     tone = "Your responses are informative." if random.random() < 0.5 else "Your response will include some humour."
 
-    # Construct the initial greeting based on the bot's name
-    initial_greeting = f"Hello! My name is {defaults['bot_name']}. How can I help you today?"
-
-    # Initial prompt instructions with dynamic tone and customizations
     prompt_instruction = {
         "role": "system",
         "content": f"""
-                    {initial_greeting}
                     {defaults['scene']}.
                     {defaults['personality']}.
                     I speak in {defaults['language']}.
@@ -40,20 +37,20 @@ def fetch_latest_chat(user_id, chatbot_id):
                     """
     }
 
-    # Initialize an empty list to store messages, including the initial instruction
+    #initialize the list with prompt instruction
     messages = [prompt_instruction]
 
-    # Reference to the specific chatbot's chats in the Firebase Realtime Database
+    #firebase reference
     ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}/chats')
 
     try:
-        # Fetch the last 5 messages for the user and specific chatbot
+        #retrieve last 5 conversations for continuity in chat
         data = ref.order_by_key().limit_to_last(5).get()
 
         if data:
             messages.extend(list(data.values()))
+    #catch exceptions       
     except Exception as e:
         print(f"An error occurred while fetching from Firebase: {e}")
 
-    # Return the accumulated messages
     return messages

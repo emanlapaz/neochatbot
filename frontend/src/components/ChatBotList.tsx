@@ -24,6 +24,7 @@ interface Chatbot {
 }
 
 function ChatBotList() {
+  //set variables
   const [chatbots, setChatbots] = useState<Chatbot[]>([]);
   const [openChatbotId, setOpenChatbotId] = useState<string | null>(null);
   const [openPlaceholderId, setOpenPlaceholderId] = useState<string | null>(
@@ -35,12 +36,14 @@ function ChatBotList() {
   );
   const [editingChatbotId, setEditingChatbotId] = useState<string | null>(null);
 
+  //function to toggle the edit form
   const toggleEditForm = (id: string) => {
     setEditingChatbotId(editingChatbotId === id ? null : id);
     setOpenPlaceholderId(null);
     setOpenChatbotId(null);
   };
 
+  //fucntion to handle chatbot update
   const handleChatbotUpdate = async (id: string, updatedChatbot: Chatbot) => {
     const auth = getAuth();
     const user = auth.currentUser;
@@ -55,6 +58,7 @@ function ChatBotList() {
     }
   };
 
+  //chat history palceholder for chat saving chat sessions for future development
   const toggleChatHistory = (id: string) => {
     if (openChatHistoryId === id) {
       setOpenChatHistoryId(null);
@@ -65,9 +69,12 @@ function ChatBotList() {
     }
   };
 
+  //custom hook usage
   const { setChatbotId } = useChatbot();
 
+  //useEffect loads the chatbot from firebase
   useEffect(() => {
+    //firebase authentication
     const auth = getAuth();
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -102,6 +109,7 @@ function ChatBotList() {
     setOpenPlaceholderId(null);
   };
 
+  //loads chatbot details using backend call
   const loadChatbotDetails = async (chatbotId: string, voiceId: string) => {
     setChatbotId(chatbotId);
     try {
@@ -135,6 +143,7 @@ function ChatBotList() {
     }
   };
 
+  //fucntion to delete chatbot
   const deleteChatbot = async (chatbotId: string) => {
     try {
       const auth = getAuth();
@@ -143,8 +152,8 @@ function ChatBotList() {
       }
       const userToken = await auth.currentUser.getIdToken(true);
       const response = await fetch(
-        //`https://neochatbot-2.onrender.com/delete-chatbot/${chatbotId}`,
-        `http://localhost:8000/delete-chatbot/${chatbotId}`,
+        `https://neochatbot-2.onrender.com/delete-chatbot/${chatbotId}`,
+        //`http://localhost:8000/delete-chatbot/${chatbotId}`,
         {
           method: "DELETE",
           headers: {
@@ -179,9 +188,12 @@ function ChatBotList() {
     }
   }
 
+  //renders loading message if data still loading
   if (loading) {
     return <div>Loading...</div>;
   }
+
+  //renders the list of chatbots
   return (
     <div className="p-4">
       <h2 className="text-xl font-bold mb-4">ChatBot List</h2>

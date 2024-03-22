@@ -34,6 +34,7 @@ const CreateBot: React.FC = () => {
     voice_name: "",
   });
 
+  //voice options
   const [voiceOptions, setVoiceOptions] = useState<VoiceOption[]>([
     {
       voice_id: "EXAVITQu4vr4xnSDxMaL",
@@ -120,6 +121,7 @@ const CreateBot: React.FC = () => {
   const [userToken, setUserToken] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
 
+  //effect hook to fetch user token and user id
   useEffect(() => {
     const auth = getAuth();
     auth.onAuthStateChanged(async (user) => {
@@ -131,6 +133,7 @@ const CreateBot: React.FC = () => {
     });
   }, []);
 
+  //handles input change
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
@@ -138,6 +141,7 @@ const CreateBot: React.FC = () => {
     setChatbots((prev) => ({ ...prev, [name]: value }));
   };
 
+  //handles form submission and create chatbot
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!userToken || !userId) {

@@ -11,9 +11,10 @@ import sys
 import os
 import json
 
-project_root = Path(__file__).parent
-functions_path = project_root / 'functions'
-sys.path.append(str(functions_path))
+#needed to specify path for backend deployment
+project_root = Path(__file__).parent #get parent directory
+functions_path = project_root / 'functions' #define path function
+sys.path.append(str(functions_path)) #add functions directory to system path
 
 from functions.firebase_database import save_chat, reset_chat_history
 from functions.openai_requests import get_chat_response, convert_audio_to_text
@@ -21,7 +22,7 @@ from functions.firebase_authorization import get_current_user
 from functions.text_to_speech import convert_text_to_speech
 
 from dotenv import load_dotenv
-load_dotenv()  # This loads the environment variables from .env
+load_dotenv()  #loads the environment variables from .env
 
 firebase_credentials_raw = os.getenv("FIREBASE_CREDENTIALS")
 firebase_credentials = json.loads(firebase_credentials_raw)
@@ -31,7 +32,7 @@ firebase_admin.initialize_app(cred, {
     'databaseURL': 'https://neo-chatbot-e6c8c-default-rtdb.europe-west1.firebasedatabase.app/'
 })
 
-
+#Pydantic models to define structure of data
 class TextMessage(BaseModel):
     text: str
     chatbotId: str
@@ -55,21 +56,22 @@ class ChatbotDetails(BaseModel):
     voice_name: Optional[str] = None
     voice_id: Optional[str] = None
 
-
 class TextToSpeechRequest(BaseModel):
     text: str
     voice_id: Optional[str] = None
 
+#fastAPI app instance
 app = FastAPI()
 
+#allowed list fo CORS
 origins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:4173",
     "http://localhost:3000",
-    "https://neochatbot.onrender.com", 
+    "https://neochatbot.onrender.com", #deployed site
 ]
-
+ #allowsclient-side web apss to interact with backend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -78,12 +80,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Check health
+#health check
 @app.get("/health")
 async def check_health():
     return {"message": "NeoChatBot! is Healthy"}
 
-#Reset messages
+#reset messages
 @app.get("/reset")
 async def reset_conversation(user_id: str = Depends(get_current_user), chatbot_id: str = Query(None)):
 
@@ -94,7 +96,7 @@ async def reset_conversation(user_id: str = Depends(get_current_user), chatbot_i
         reset_chat_history(user_id, chatbot_id)
         return {"message": f"Chat history for chatbot {chatbot_id} has been reset."}
 
-
+#retrieves the bot name and display it in the frontend
 @app.get("/get-bot-name/{chatbot_id}")
 
 async def get_bot_name(chatbot_id: str, user_id: str = Depends(get_current_user)):
@@ -110,7 +112,7 @@ async def get_bot_name(chatbot_id: str, user_id: str = Depends(get_current_user)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve bot name: {str(e)}")
 
-#Post text and get response
+#post text and get response
 @app.post("/post-text/")
 async def post_text(message: TextMessage, user_id: str = Depends(get_current_user)):
     text = message.text
@@ -124,9 +126,7 @@ async def post_text(message: TextMessage, user_id: str = Depends(get_current_use
 
     return {"user_message": text, "bot_response": chat_response}
 
-
-
-#User Signup
+#user Signup
 @app.post("/signup/")
 async def signup(user_details: UserSignupModel):
     try:
@@ -147,21 +147,24 @@ async def signup(user_details: UserSignupModel):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-
+#create chatbot for the current user
 @app.post("/create-chatbot/")
 async def create_chatbot(chatbots: ChatbotDetails, user_id: str = Depends(get_current_user)):
     try:
+        #converts Pydantic model to dict and exclude user id
         chatbots_dict = chatbots.dict(exclude={'user_id'})
         
+        #adds the new chatbot
         new_chatbot_ref = db.reference(f'users/{user_id}/chatbots').push(chatbots_dict)
         
+        #gets the unique ID
         chatbot_id = new_chatbot_ref.key
         
         return {"status": "Customization saved", "chatbot_id": chatbot_id, "chatbots": chatbots_dict}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to save chatbot: {str(e)}")
 
-
+#loads te chatbot details based on the user
 @app.post("/load-chatbot/")
 async def load_chatbot(data: dict, user_id: str = Depends(get_current_user)):
     chatbot_id = data.get("chatbot_id")
@@ -169,61 +172,68 @@ async def load_chatbot(data: dict, user_id: str = Depends(get_current_user)):
         raise HTTPException(status_code=400, detail="Chatbot ID is required")
     
     try:
+        #retrieves chatbot details from db
         chatbot_ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}')
+
         chatbot_details = chatbot_ref.get()
+
         if not chatbot_details:
             raise HTTPException(status_code=404, detail="Chatbot not found")
 
-        if "voice_id" in chatbot_details:
-            print(f"Voice ID: {chatbot_details['voice_id']} found for chatbot: {chatbot_id}")
-        else:
-            print(f"No Voice ID found for chatbot: {chatbot_id}")
-
         return chatbot_details
+    #catch errors
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to load chatbot: {str(e)}")
-    
+
+#deletes a chatbot based on the current user
 @app.delete("/delete-chatbot/{chatbot_id}")
 async def delete_chatbot(chatbot_id: str, user_id: str = Depends(get_current_user)):
     try:
+        #reference chatbot in db and check if it exists
         chatbot_ref = db.reference(f'users/{user_id}/chatbots/{chatbot_id}')
 
+        #returns 404 if chatbot not found
         if not chatbot_ref.get():
             return JSONResponse(status_code=404, content={"message": "Chatbot not found"})
         
+        #delete from db
         chatbot_ref.delete()
-        
+
         return {"message": f"Chatbot {chatbot_id} successfully deleted."}
+    
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to delete chatbot: {str(e)}")
 
-#Convert audio to text
+#convert audio file to text
 @app.post("/post-audio/")
 async def post_audio(file: UploadFile = File(...)):
 
+    #save audio file temporarily
     with open(file.filename, "wb") as buffer:
         buffer.write(file.file.read())
     audio_input = open(file.filename, "rb")
 
-    # Decode audio
+    #decode audio file to text
     message_decoded = convert_audio_to_text(audio_input)
 
-    print(message_decoded)
-
     if not message_decoded:
-        raise HTTPException(status_code=400, detail="Failed to decode audio")
+        raise HTTPException(status_code=400, detail="Failed to decode audio file")
     
     return {"message": message_decoded}
 
-
+#convert text to speech and return as a stream
 @app.post("/convert-text-to-speech/")
 async def text_to_speech_endpoint(request: TextToSpeechRequest):
+
+    #convert text to speech
     audio_output = convert_text_to_speech(request.text, request.voice_id)
     
     if not audio_output:
         raise HTTPException(status_code=400, detail="Failed audio output")
     
+    #define a generator function to yield the audio output
     def iterfile():
         yield audio_output
 
+    #return audio output as streaming response, users can receive immediate feedback/ faster response
     return StreamingResponse(iterfile(), media_type="application/octet-stream")
