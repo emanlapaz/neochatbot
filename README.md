@@ -1,5 +1,7 @@
 <h1>NEO Chatbot Creator Web App</h1>
 </br>
+<img src="https://github.com/emanlapaz/neochatbot/assets/96552779/d9998f98-aee5-4af6-a997-668298a96984" alt="Alt text" width="200"/>
+</br>
 <h3>Project Landing Page: https://emanlapaz.github.io/NeoLandingPage/</h3>
 <h3>Video Demo Link: https://www.youtube.com/watch?v=0H4-xBDnlL8 </h3>
 <h3>Web App Link: https://neochatbot.onrender.com/</h3>
